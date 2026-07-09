@@ -1,0 +1,197 @@
+﻿import { Router } from 'express';
+import { authController } from './auth.controller';
+import { authenticate } from '@/middleware/auth';
+import { validate } from '@/middleware/validate';
+import {
+  registerSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from '@lumora/validators';
+
+const router = Router();
+
+/**
+ * @openapi
+ * /auth/register:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Register a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email: { type: string }
+ *               password: { type: string }
+ *               name: { type: string }
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ */
+router.post('/register', validate({ body: registerSchema }), authController.register);
+
+/**
+ * @openapi
+ * /auth/login:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Login with email and password
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email: { type: string }
+ *               password: { type: string }
+ *               rememberMe: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Login successful
+ */
+router.post('/login', validate({ body: loginSchema }), authController.login);
+
+/**
+ * @openapi
+ * /auth/logout:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Logout and invalidate session
+ *     responses:
+ *       200:
+ *         description: Logged out successfully
+ */
+router.post('/logout', authController.logout);
+
+/**
+ * @openapi
+ * /auth/refresh:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Refresh access token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken: { type: string }
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ */
+router.post('/refresh', authController.refresh);
+
+/**
+ * @openapi
+ * /auth/forgot-password:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Request password reset
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email: { type: string }
+ *     responses:
+ *       200:
+ *         description: If email exists, reset link sent
+ */
+router.post(
+  '/forgot-password',
+  validate({ body: forgotPasswordSchema }),
+  authController.forgotPassword,
+);
+
+/**
+ * @openapi
+ * /auth/reset-password:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Reset password with token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token: { type: string }
+ *               password: { type: string }
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ */
+router.post('/reset-password', validate({ body: resetPasswordSchema }), authController.resetPassword);
+
+/**
+ * @openapi
+ * /auth/me:
+ *   get:
+ *     tags: [Auth]
+ *     summary: Get current user profile
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user profile
+ */
+router.get('/me', authenticate, authController.getMe);
+
+/**
+ * @openapi
+ * /auth/google:
+ *   get:
+ *     tags: [Auth]
+ *     summary: Google OAuth login
+ *     responses:
+ *       200:
+ *         description: Google OAuth endpoint
+ */
+router.get('/google', authController.googleAuth);
+
+/**
+ * @openapi
+ * /auth/google/callback:
+ *   get:
+ *     tags: [Auth]
+ *     summary: Google OAuth callback
+ *     responses:
+ *       200:
+ *         description: Google OAuth callback
+ */
+router.get('/google/callback', authController.googleCallback);
+
+/**
+ * @openapi
+ * /auth/github:
+ *   get:
+ *     tags: [Auth]
+ *     summary: GitHub OAuth login
+ *     responses:
+ *       200:
+ *         description: GitHub OAuth endpoint
+ */
+router.get('/github', authController.githubAuth);
+
+/**
+ * @openapi
+ * /auth/github/callback:
+ *   get:
+ *     tags: [Auth]
+ *     summary: GitHub OAuth callback
+ *     responses:
+ *       200:
+ *         description: GitHub OAuth callback
+ */
+router.get('/github/callback', authController.githubCallback);
+
+export default router;

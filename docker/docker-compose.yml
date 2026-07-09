@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lumora-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lumora}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lumora}
+      POSTGRES_DB: ${POSTGRES_DB:-lumora}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./packages/database/prisma:/var/lib/postgresql/prisma
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'lumora']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: lumora-redis
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    container_name: lumora-api
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://lumora:lumora@postgres:5432/lumora
+      - REDIS_URL=redis://redis:6379
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - PORT=4000
+    ports:
+      - '4000:4000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.web
+    container_name: lumora-web
+    environment:
+      - VITE_API_URL=http://localhost:4000/api/v1
+    ports:
+      - '5173:80'
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
