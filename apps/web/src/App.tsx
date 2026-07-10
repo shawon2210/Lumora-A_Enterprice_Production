@@ -32,16 +32,12 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <LandingPage /> },
+      { path: 'auth', element: <AuthLayout /> },
+      { path: 'auth/login', element: <LoginPage /> },
+      { path: 'auth/register', element: <RegisterPage /> },
+      { path: 'auth/forgot-password', element: <ForgotPasswordPage /> },
+      { path: 'auth/reset-password', element: <ResetPasswordPage /> },
       { path: 'auth/callback', element: <AuthCallbackPage /> },
-      {
-        element: <AuthLayout />,
-        children: [
-          { path: 'login', element: <LoginPage /> },
-          { path: 'register', element: <RegisterPage /> },
-          { path: 'forgot-password', element: <ForgotPasswordPage /> },
-          { path: 'reset-password', element: <ResetPasswordPage /> },
-        ],
-      },
       {
         element: <ProtectedRoute />,
         children: [
