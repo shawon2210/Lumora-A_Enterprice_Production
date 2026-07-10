@@ -72,10 +72,7 @@ export default function LandingPage() {
           {/* Navigation */}
           <nav className="flex items-center justify-between py-6">
             {/* Logo */}
-            <div
-              className="text-xl italic text-white sm:text-2xl"
-              style={{ fontFamily: "'Instrument Serif', serif" }}
-            >
+            <div className="text-xl italic text-white sm:text-2xl" style={{ fontFamily: "'Instrument Serif', serif" }}>
               Lumora
             </div>
 
@@ -85,7 +82,7 @@ export default function LandingPage() {
                 {navLinks.map((link) => (
                   <a
                     key={link}
-                    href="#"
+                    href="#{link.toLowerCase().replace(' ', '-')}"
                     className="rounded-full px-4 py-2 text-sm text-white/90 transition-colors hover:text-white"
                     style={{ fontFamily: 'system-ui, sans-serif' }}
                   >
@@ -116,9 +113,7 @@ export default function LandingPage() {
               </span>
               <span
                 className={`absolute transition-all duration-300 ease-in-out ${
-                  mobileMenuOpen
-                    ? 'rotate-0 scale-100 opacity-100'
-                    : '-rotate-90 scale-75 opacity-0'
+                  mobileMenuOpen ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-75 opacity-0'
                 }`}
               >
                 <X className="h-5 w-5 text-white" />
@@ -129,15 +124,12 @@ export default function LandingPage() {
           {/* Mobile Menu Overlay */}
           {mobileMenuOpen && (
             <div className="fixed inset-0 z-50 md:hidden">
-              <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={() => setMobileMenuOpen(false)}
-              />
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-8">
                 {navLinks.map((link, i) => (
                   <a
                     key={link}
-                    href="#"
+                    href="#{link.toLowerCase().replace(' ', '-')}"
                     className="animate-menu-slide-up text-3xl text-white"
                     style={{
                       fontFamily: 'system-ui, sans-serif',
@@ -172,9 +164,7 @@ export default function LandingPage() {
               className={`liquid-glass mb-6 rounded-full px-5 py-2.5 transition-colors duration-700 ${heroTextClass}`}
               style={{ fontFamily: 'system-ui, sans-serif' }}
             >
-              <span className="text-sm sm:text-base">
-                Over 10,000 minds already finding their clarity
-              </span>
+              <span className="text-sm sm:text-base">Over 10,000 minds already finding their clarity</span>
             </div>
 
             {/* Heading */}
@@ -192,8 +182,8 @@ export default function LandingPage() {
               className={`mb-8 max-w-xl text-sm leading-relaxed transition-colors duration-700 sm:text-base ${heroSubTextClass}`}
               style={{ fontFamily: 'system-ui, sans-serif' }}
             >
-              Rise above the chaos of pings, infinite scrolling, and relentless demands. Discover
-              how to protect your presence and create with intention.
+              Rise above the chaos of pings, infinite scrolling, and relentless demands. Discover how to protect your
+              presence and create with intention.
             </p>
 
             {/* Email Input */}
@@ -245,6 +235,96 @@ export default function LandingPage() {
             <span className="hidden sm:inline">|</span>
             <span>Intentional-First Design</span>
           </div>
+
+          {/* Features Section */}
+          <section id="features" className="relative bg-black/50 px-4 py-20">
+            <div className="container mx-auto max-w-7xl">
+              <h2 className="mb-16 text-center text-5xl font-bold">Features</h2>
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {/* Feature Cards */}
+                <div className="liquid-glass rounded-xl p-6 transition-transform hover:scale-105">
+                  <h3 className="mb-4 text-2xl font-semibold">Blog Management</h3>
+                  <p className="text-white/70">
+                    Create, read, update, and delete blog posts with tagging and categorization.
+                  </p>
+                </div>
+                <div className="liquid-glass rounded-xl p-6 transition-transform hover:scale-105">
+                  <h3 className="mb-4 text-2xl font-semibold">Media Upload</h3>
+                  <p className="text-white/70">
+                    Cloud-based file uploads with folder organization and Cloudinary integration.
+                  </p>
+                </div>
+                <div className="liquid-glass rounded-xl p-6 transition-transform hover:scale-105">
+                  <h3 className="mb-4 text-2xl font-semibold">User Auth</h3>
+                  <p className="text-white/70">Secure JWT-based authentication with httpOnly cookies and OAuth.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* How It Works Section */}
+          <section id="how-it-works" className="relative bg-black/30 px-4 py-20">
+            <div className="container mx-auto max-w-7xl">
+              <h2 className="mb-16 text-center text-5xl font-bold">How It Works</h2>
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                {/* How It Works Cards */}
+                <div className="liquid-glass rounded-xl p-6 transition-transform hover:scale-105">
+                  <h3 className="mb-4 text-2xl font-semibold">1. Sign Up</h3>
+                  <p className="text-white/70">Register with your email or using OAuth providers to get started.</p>
+                </div>
+                <div className="liquid-glass rounded-xl p-6 transition-transform hover:scale-105">
+                  <h3 className="mb-4 text-2xl font-semibold">2. Create Content</h3>
+                  <p className="text-white/70">Write and manage your blog posts and media files with ease.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Pricing Section */}
+          <section id="pricing" className="relative bg-black/50 px-4 py-20">
+            <div className="container mx-auto max-w-7xl">
+              <h2 className="mb-16 text-center text-5xl font-bold">Pricing</h2>
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+                {/* Pricing Cards */}
+                <div className="liquid-glass rounded-xl p-6 transition-transform hover:scale-105">
+                  <h3 className="mb-4 text-2xl font-semibold">Free</h3>
+                  <p className="my-4 text-4xl font-bold">$0</p>
+                  <p className="text-white/70">Basic features for getting started.</p>
+                </div>
+                <div className="liquid-glass rounded-xl border-2 border-white/20 p-6 transition-transform hover:scale-105">
+                  <h3 className="mb-4 text-2xl font-semibold">Pro</h3>
+                  <p className="my-4 text-4xl font-bold">$19</p>
+                  <p className="text-white/70">Advanced features for power users.</p>
+                </div>
+                <div className="liquid-glass rounded-xl p-6 transition-transform hover:scale-105">
+                  <h3 className="mb-4 text-2xl font-semibold">Enterprise</h3>
+                  <p className="my-4 text-4xl font-bold">$99</p>
+                  <p className="text-white/70">Full suite for organizations.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Community Section */}
+          <section id="community" className="relative bg-black/30 px-4 py-20">
+            <div className="container mx-auto max-w-7xl">
+              <h2 className="mb-16 text-center text-5xl font-bold">Community</h2>
+              <div className="mx-auto max-w-3xl">
+                <p className="mb-8 text-center text-lg text-white/70">
+                  Join our vibrant community of creators, developers, and thinkers. Share your work, get feedback, and
+                  grow together.
+                </p>
+                <div className="flex justify-center">
+                  <div className="liquid-glass rounded-xl p-8">
+                    <h3 className="mb-4 text-2xl font-semibold">Get Started Today</h3>
+                    <button className="rounded-full bg-white px-8 py-3 text-lg text-black transition-colors hover:bg-white/90">
+                      Join Community
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
     </>
