@@ -1,7 +1,8 @@
-import { blogRepository } from './blog.repository';
+import { blogRepository, type UpdatePostData } from './blog.repository';
 import { NotFoundError, ForbiddenError } from '@/utils/errors';
 import { generateSlug, makeUniqueSlug } from '@/utils/slug';
-import { getPaginationParams, buildPaginationMeta } from '@/utils/pagination';
+import { getPaginationParams, buildPaginationMeta, type PaginateParams } from '@/utils/pagination';
+import { cache } from '@/utils/cache';
 
 interface CreatePostInput {
   title: string;
@@ -32,7 +33,7 @@ function formatPost(post: PostRaw) {
     seoDescription: _seoDescription,
     canonicalUrl: _canonicalUrl,
     ...rest
-  } = post as any;
+  } = post;
   return {
     ...rest,
     author: { id: author.id, name: author.name, avatar: author.avatar },
@@ -42,26 +43,41 @@ function formatPost(post: PostRaw) {
 
 export class BlogService {
   async listPosts(query: Record<string, unknown>) {
-    const { page, limit, skip } = getPaginationParams(query as any);
-    const status = query.status as string | undefined;
-    const search = query.search as string | undefined;
-    const authorId = query.authorId as string | undefined;
+    return cache.getOrSet(
+      `blog:posts:${JSON.stringify(query)}`,
+      async () => {
+        const { page, limit, skip } = getPaginationParams(query as PaginateParams);
+        const status = query.status as string | undefined;
+        const search = query.search as string | undefined;
+        const authorId = query.authorId as string | undefined;
 
-    const [posts, total] = await Promise.all([
-      blogRepository.findPosts({ page, limit, skip, status, search, authorId }),
-      blogRepository.countPosts({ status, search, authorId }),
-    ]);
+        const [posts, total] = await Promise.all([
+          blogRepository.findPosts({ page, limit, skip, status, search, authorId }),
+          blogRepository.countPosts({ status, search, authorId }),
+        ]);
 
-    return {
-      posts: posts.map(formatPost),
-      meta: buildPaginationMeta(total, page, limit),
-    };
+        return {
+          posts: posts.map(formatPost),
+          meta: buildPaginationMeta(total, page, limit),
+        };
+      },
+      60,
+    );
   }
 
   async getPost(slug: string) {
+    const cached = await cache.get<any>(`blog:post:${slug}`);
+    if (cached !== null) return cached;
+
     const post = await blogRepository.findPostBySlug(slug);
     if (!post) throw new NotFoundError('Blog post');
-    return formatPost(post);
+    const formatted = formatPost(post);
+
+    if (post.status === 'PUBLISHED') {
+      await cache.set(`blog:post:${slug}`, formatted, 120);
+    }
+
+    return formatted;
   }
 
   async createPost(user: { id: string; role: string }, input: CreatePostInput) {
@@ -81,6 +97,12 @@ export class BlogService {
       tags: input.tags,
     });
 
+    await cache.delPattern('blog:posts:*');
+    await cache.delPattern('search:*');
+    if (post.status === 'PUBLISHED') {
+      await cache.del(`blog:post:${post.slug}`);
+    }
+
     return formatPost(post);
   }
 
@@ -91,7 +113,7 @@ export class BlogService {
       throw new ForbiddenError('Not authorized to update this post');
     }
 
-    const data: Record<string, unknown> = {};
+    const data: UpdatePostData = {};
     if (input.title !== undefined) data.title = input.title;
     if (input.excerpt !== undefined) data.excerpt = input.excerpt;
     if (input.content !== undefined) data.content = input.content;
@@ -104,7 +126,12 @@ export class BlogService {
     }
     if (input.tags !== undefined) data.tags = input.tags;
 
-    const post = await blogRepository.updatePost(id, data as any);
+    const post = await blogRepository.updatePost(id, data);
+
+    await cache.delPattern('blog:posts:*');
+    await cache.delPattern('blog:post:*');
+    await cache.delPattern('search:*');
+
     return formatPost(post);
   }
 
@@ -115,6 +142,10 @@ export class BlogService {
       throw new ForbiddenError('Not authorized to delete this post');
     }
     await blogRepository.deletePost(id);
+
+    await cache.delPattern('blog:posts:*');
+    await cache.delPattern('blog:post:*');
+    await cache.delPattern('search:*');
   }
 }
 

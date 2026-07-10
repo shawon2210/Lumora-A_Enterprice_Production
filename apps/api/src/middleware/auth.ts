@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '@/utils/jwt';
 import { prisma } from '@lumora/database';
 import { UnauthorizedError } from '@/utils/errors';
+import type { User } from '@lumora/shared';
 
 export async function authenticate(req: Request, _res: Response, next: NextFunction) {
   const header = req.headers.authorization;
@@ -29,7 +30,7 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
     if (!user) {
       return next(new UnauthorizedError('User not found'));
     }
-    (req as any).user = user;
+    req.user = user as User;
     next();
   } catch {
     next(new UnauthorizedError('Invalid or expired token'));
@@ -61,7 +62,7 @@ export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
         },
       })
       .then((user) => {
-        if (user) (req as any).user = user;
+        if (user) req.user = user as User;
         next();
       })
       .catch(() => next());

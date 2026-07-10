@@ -1,6 +1,7 @@
 import { adminRepository } from './admin.repository';
 import { getPaginationParams, buildPaginationMeta } from '@/utils/pagination';
 import { NotFoundError } from '@/utils/errors';
+import { cache } from '@/utils/cache';
 
 export const adminService = {
   async listUsers(query: { page?: string; limit?: string; search?: string; role?: string }) {
@@ -24,17 +25,20 @@ export const adminService = {
   async updateRole(id: string, role: string) {
     const user = await adminRepository.findUserById(id);
     if (!user) throw new NotFoundError('User');
-    return adminRepository.updateUserRole(id, role);
+    const updated = await adminRepository.updateUserRole(id, role);
+    await cache.del('admin:analytics');
+    return updated;
   },
 
   async deleteUser(id: string) {
     const user = await adminRepository.findUserById(id);
     if (!user) throw new NotFoundError('User');
     await adminRepository.deleteUser(id);
+    await cache.del('admin:analytics');
   },
 
   async getAnalytics() {
-    return adminRepository.getAnalytics();
+    return cache.getOrSet('admin:analytics', () => adminRepository.getAnalytics(), 30);
   },
 
   async listAuditLogs(query: { page?: string; limit?: string; search?: string; action?: string }) {

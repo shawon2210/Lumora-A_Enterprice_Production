@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken } from '../utils/jwt';
 
 describe('JWT Utilities', () => {
@@ -23,7 +23,7 @@ describe('JWT Utilities', () => {
       expect(token.split('.').length).toBe(3);
     });
 
-it('should include correct payload in token', () => {
+    it('should include correct payload in token', () => {
       const token = signAccessToken(testPayload);
       const decoded = verifyAccessToken(token);
 
@@ -51,7 +51,7 @@ it('should include correct payload in token', () => {
   });
 
   describe('verifyAccessToken', () => {
-it('should verify a valid token', () => {
+    it('should verify a valid token', () => {
       const token = signAccessToken(testPayload);
       const decoded = verifyAccessToken(token);
 
@@ -65,7 +65,7 @@ it('should verify a valid token', () => {
   });
 
   describe('verifyRefreshToken', () => {
-it('should verify a valid refresh token', () => {
+    it('should verify a valid refresh token', () => {
       const token = signRefreshToken(testPayload);
       const decoded = verifyRefreshToken(token);
 

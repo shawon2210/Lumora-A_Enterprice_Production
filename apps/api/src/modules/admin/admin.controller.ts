@@ -5,7 +5,9 @@ import { sendSuccess } from '@/utils/response';
 export const adminController = {
   async listUsers(req: Request, res: Response, next: NextFunction) {
     try {
-      const { users, meta } = await adminService.listUsers(req.query as any);
+      const { users, meta } = await adminService.listUsers(
+        req.query as { page?: string; limit?: string; search?: string; role?: string },
+      );
       sendSuccess(res, { users, meta });
     } catch (err) {
       next(err);
@@ -50,7 +52,9 @@ export const adminController = {
 
   async listAuditLogs(req: Request, res: Response, next: NextFunction) {
     try {
-      const { logs, meta } = await adminService.listAuditLogs(req.query as any);
+      const { logs, meta } = await adminService.listAuditLogs(
+        req.query as { page?: string; limit?: string; search?: string; action?: string },
+      );
       sendSuccess(res, { logs, meta });
     } catch (err) {
       next(err);

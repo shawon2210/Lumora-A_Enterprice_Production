@@ -5,7 +5,7 @@ import { sendSuccess } from '@/utils/response';
 export const notificationsController = {
   async listNotifications(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await notificationsService.listNotifications(req.user!.id, req.query as any);
+      const result = await notificationsService.listNotifications(req.user!.id, req.query as { page?: string });
       sendSuccess(res, result);
     } catch (err) {
       next(err);

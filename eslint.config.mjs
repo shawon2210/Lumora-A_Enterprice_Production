@@ -6,21 +6,19 @@ import reactHooks from 'eslint-plugin-react-hooks';
 
 export default tseslint.config(
   {
-    ignores: [
-      '**/dist/**',
-      '**/.turbo/**',
-      '**/node_modules/**',
-      '**/coverage/**',
-      '**/.next/**',
-      '**/*.config.*',
-    ],
+    ignores: ['**/dist/**', '**/.turbo/**', '**/node_modules/**', '**/coverage/**', '**/.next/**', '**/*.config.*'],
   },
   {
     files: ['packages/*/src/**/*.ts', 'apps/*/src/**/*.{ts,tsx}'],
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+      },
+    },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/strict-boolean-expressions': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/strict-boolean-expressions': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
     },
   },

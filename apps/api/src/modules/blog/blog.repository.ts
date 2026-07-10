@@ -23,7 +23,7 @@ interface CreatePostData {
   tags?: string[];
 }
 
-interface UpdatePostData {
+export interface UpdatePostData {
   title?: string;
   slug?: string;
   excerpt?: string | null;
@@ -41,14 +41,9 @@ const postInclude: Prisma.BlogPostInclude = {
   },
 };
 
-function buildWhere(params: {
-  status?: string;
-  search?: string;
-  authorId?: string;
-}): Prisma.BlogPostWhereInput {
+function buildWhere(params: { status?: string; search?: string; authorId?: string }): Prisma.BlogPostWhereInput {
   const where: Prisma.BlogPostWhereInput = {};
-  if (params.status)
-    where.status = params.status as BlogPostStatus;
+  if (params.status) where.status = params.status as BlogPostStatus;
   if (params.search) where.title = { contains: params.search, mode: 'insensitive' };
   if (params.authorId) where.authorId = params.authorId;
   return where;
@@ -154,7 +149,7 @@ export class BlogRepository {
         }
       }
 
-      const updateInput: any = { ...postData };
+      const updateInput: Record<string, unknown> = { ...postData };
       if (postData.status) {
         updateInput.status = postData.status as BlogPostStatus;
       }

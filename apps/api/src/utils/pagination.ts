@@ -1,6 +1,6 @@
 import type { PaginationMeta } from '@lumora/shared';
 
-interface PaginateParams {
+export interface PaginateParams {
   page?: number;
   limit?: number;
 }

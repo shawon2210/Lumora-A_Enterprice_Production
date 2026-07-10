@@ -6,11 +6,7 @@ class CloudinaryService {
   private isConfigured: boolean;
 
   constructor() {
-    this.isConfigured = !!(
-      config.cloudinary.cloudName &&
-      config.cloudinary.apiKey &&
-      config.cloudinary.apiSecret
-    );
+    this.isConfigured = !!(config.cloudinary.cloudName && config.cloudinary.apiKey && config.cloudinary.apiSecret);
   }
 
   async upload(_file: Express.Multer.File): Promise<{ url: string; publicId: string }> {
@@ -26,21 +22,18 @@ class CloudinaryService {
 
     // Production: Upload to Cloudinary
     const formData = new FormData();
-    formData.append('file', new Blob([(_file as any).buffer]), _file.originalname);
+    formData.append('file', new Blob([_file.buffer]), _file.originalname);
     formData.append('upload_preset', 'lumora-media');
 
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${config.cloudinary.cloudName}/upload`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic ${Buffer.from(
-            `${config.cloudinary.apiKey}:${config.cloudinary.apiSecret}`,
-          ).toString('base64')}`,
-        },
-        body: formData as any,
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${config.cloudinary.cloudName}/upload`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${config.cloudinary.apiKey}:${config.cloudinary.apiSecret}`).toString(
+          'base64',
+        )}`,
       },
-    );
+      body: formData, // FormData is supported by modern fetch API
+    });
 
     if (!response.ok) {
       throw new Error('Failed to upload to Cloudinary');

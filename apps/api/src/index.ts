@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import app from '@/app';
 import { config } from '@/config/env';
 import { logger } from '@/utils/logger';
@@ -36,14 +35,14 @@ async function main() {
   let io: SocketIO | null = null;
   try {
     const { Server } = await import('socket.io');
+    const { verifyAccessToken } = await import('@/utils/jwt');
     io = new Server(httpServer, {
       cors: { origin: config.cors.origin, credentials: true },
     });
-    io.use((socket: SocketWithUserId, next: (err?: Error) => void) => {
+    io.use(async (socket: SocketWithUserId, next: (err?: Error) => void) => {
       const token = socket.handshake?.auth?.token;
       if (!token) return next(new Error('Authentication required'));
       try {
-        const { verifyAccessToken } = require('@/utils/jwt');
         const payload = verifyAccessToken(token);
         socket.userId = payload.sub;
         next();

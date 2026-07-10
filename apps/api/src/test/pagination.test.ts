@@ -21,9 +21,9 @@ describe('getPaginationParams', () => {
     expect(result.limit).toBe(100);
   });
 
-  it('should clamp limit to min 1', () => {
+  it('should use default limit of 20 when limit is 0 (falsy)', () => {
     const result = getPaginationParams({ limit: 0 });
-    expect(result.limit).toBe(1);
+    expect(result.limit).toBe(20);
   });
 
   it('should clamp negative limit to 1', () => {

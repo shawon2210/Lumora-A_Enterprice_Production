@@ -22,7 +22,7 @@ export async function getPost(req: Request, res: Response, next: NextFunction) {
 
 export async function createPost(req: Request, res: Response, next: NextFunction) {
   try {
-    const post = await blogService.createPost(req.user as any, req.body);
+    const post = await blogService.createPost(req.user!, req.body);
     sendSuccess(res, post, undefined, 201);
   } catch (err) {
     next(err);
@@ -31,7 +31,7 @@ export async function createPost(req: Request, res: Response, next: NextFunction
 
 export async function updatePost(req: Request, res: Response, next: NextFunction) {
   try {
-    const post = await blogService.updatePost(req.params.id as string, req.user as any, req.body);
+    const post = await blogService.updatePost(req.params.id as string, req.user!, req.body);
     sendSuccess(res, post);
   } catch (err) {
     next(err);
@@ -40,7 +40,7 @@ export async function updatePost(req: Request, res: Response, next: NextFunction
 
 export async function deletePost(req: Request, res: Response, next: NextFunction) {
   try {
-    await blogService.deletePost(req.params.id as string, req.user as any);
+    await blogService.deletePost(req.params.id as string, req.user!);
     sendMessage(res, 'Post deleted successfully');
   } catch (err) {
     next(err);

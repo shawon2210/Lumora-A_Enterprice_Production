@@ -14,7 +14,7 @@ export function configurePassport() {
           clientID: config.oauth.google.clientId,
           clientSecret: config.oauth.google.clientSecret,
           callbackURL: config.oauth.google.callbackUrl,
-        } as any,
+        } as any, // Passport types are incomplete
         async (accessToken: any, refreshToken: any, profile: any, done: any) => {
           try {
             const result = await authService.handleOAuth('google', {
@@ -41,7 +41,7 @@ export function configurePassport() {
           clientSecret: config.oauth.github.clientSecret,
           callbackURL: config.oauth.github.callbackUrl,
           passReqToCallback: true,
-        } as any,
+        } as any, // Passport types are incomplete
         async (req: any, accessToken: any, refreshToken: any, profile: any, done: any) => {
           try {
             const result = await authService.handleOAuth('github', {

@@ -5,7 +5,10 @@ import { sendSuccess } from '@/utils/response';
 export const mediaController = {
   async listMedia(req: Request, res: Response, next: NextFunction) {
     try {
-      const { media, meta } = await mediaService.listMedia(req.user!.id, req.query as any);
+      const { media, meta } = await mediaService.listMedia(
+        req.user!.id,
+        req.query as { page?: string; type?: string; search?: string },
+      );
       sendSuccess(res, { media, meta });
     } catch (err) {
       next(err);

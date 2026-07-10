@@ -29,9 +29,7 @@ export const authController = {
     try {
       const rememberMe = req.body.rememberMe ?? false;
       const result = await authService.login(req.body, rememberMe);
-      const maxAge = rememberMe
-        ? config.session.rememberMeDays * 24 * 60 * 60 * 1000
-        : 24 * 60 * 60 * 1000;
+      const maxAge = rememberMe ? config.session.rememberMeDays * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
       res.cookie(REFRESH_COOKIE_NAME, result.refreshToken, {
         ...COOKIE_OPTIONS,
         maxAge,
@@ -44,9 +42,7 @@ export const authController = {
 
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      const token = req.headers.authorization?.startsWith('Bearer ')
-        ? req.headers.authorization.slice(7)
-        : undefined;
+      const token = req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.slice(7) : undefined;
       if (token) {
         await authService.logout(token);
       }
@@ -92,7 +88,7 @@ export const authController = {
 
   async getMe(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await authService.getProfile((req.user as any)!.id);
+      const user = await authService.getProfile(req.user!.id);
       sendSuccess(res, user);
     } catch (err) {
       next(err);
@@ -100,7 +96,7 @@ export const authController = {
   },
 
   async oauthCallback(req: Request, res: Response) {
-    const result = req.user as any;
+    const result = req.user as unknown as { accessToken: string; refreshToken: string };
     if (!result) {
       return res.redirect(`${config.frontendUrl}/login?error=oauth_failed`);
     }

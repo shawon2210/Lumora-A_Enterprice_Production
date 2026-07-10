@@ -1,5 +1,5 @@
 import { prisma } from '@lumora/database';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, Role } from '@prisma/client';
 
 export const adminRepository = {
   findUsers(params: { skip: number; limit: number; search?: string; role?: string }) {
@@ -10,7 +10,7 @@ export const adminRepository = {
         { name: { contains: params.search, mode: 'insensitive' } },
       ];
     }
-    if (params.role) where.role = params.role as never;
+    if (params.role) where.role = params.role as Role;
     return prisma.user.findMany({
       where,
       skip: params.skip,
@@ -39,7 +39,7 @@ export const adminRepository = {
         { name: { contains: params.search, mode: 'insensitive' } },
       ];
     }
-    if (params.role) where.role = params.role as never;
+    if (params.role) where.role = params.role as Role;
     return prisma.user.count({ where });
   },
 
@@ -50,7 +50,7 @@ export const adminRepository = {
   updateUserRole(id: string, role: string) {
     return prisma.user.update({
       where: { id },
-      data: { role: role as never },
+      data: { role: role as Role },
       select: {
         id: true,
         email: true,

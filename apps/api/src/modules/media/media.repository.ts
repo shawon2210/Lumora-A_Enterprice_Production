@@ -1,16 +1,10 @@
 import { prisma } from '@lumora/database';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, MediaType } from '@prisma/client';
 
 export const mediaRepository = {
-  findMedia(params: {
-    userId: string;
-    skip: number;
-    limit: number;
-    type?: string;
-    search?: string;
-  }) {
+  findMedia(params: { userId: string; skip: number; limit: number; type?: string; search?: string }) {
     const where: Prisma.MediaWhereInput = { userId: params.userId };
-    if (params.type) where.type = params.type as never;
+    if (params.type) where.type = params.type as MediaType;
     if (params.search) where.name = { contains: params.search, mode: 'insensitive' };
     return prisma.media.findMany({
       where,
@@ -22,7 +16,7 @@ export const mediaRepository = {
 
   countMedia(params: { userId: string; type?: string; search?: string }) {
     const where: Prisma.MediaWhereInput = { userId: params.userId };
-    if (params.type) where.type = params.type as never;
+    if (params.type) where.type = params.type as MediaType;
     if (params.search) where.name = { contains: params.search, mode: 'insensitive' };
     return prisma.media.count({ where });
   },
@@ -31,9 +25,9 @@ export const mediaRepository = {
     return prisma.media.findUnique({ where: { id } });
   },
 
-   createMedia(data: {
+  createMedia(data: {
     url: string;
-    type: string;
+    type: MediaType;
     name: string;
     size: number;
     mimeType: string;
@@ -44,14 +38,14 @@ export const mediaRepository = {
     return prisma.media.create({
       data: {
         url: data.url,
-        type: data.type as any,
+        type: data.type,
         name: data.name,
         size: data.size,
         mimeType: data.mimeType,
         userId: data.userId,
         width: data.width,
         height: data.height,
-      } as any,
+      } as Prisma.MediaUncheckedCreateInput,
     });
   },
 
