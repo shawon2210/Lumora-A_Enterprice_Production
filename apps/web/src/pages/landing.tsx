@@ -79,9 +79,9 @@ export default function LandingPage() {
             {/* Desktop Nav */}
             <div className="hidden items-center md:flex">
               <div className="liquid-glass flex items-center gap-1 rounded-full px-2 py-2">
-                {navLinks.map((link) => (
+                {navLinks.map((link, index) => (
                   <a
-                    key={link}
+                    key={index}
                     href="#{link.toLowerCase().replace(' ', '-')}"
                     className="rounded-full px-4 py-2 text-sm text-white/90 transition-colors hover:text-white"
                     style={{ fontFamily: 'system-ui, sans-serif' }}
@@ -89,12 +89,13 @@ export default function LandingPage() {
                     {link}
                   </a>
                 ))}
-                <button
+                <a
+                  href="/auth/register"
                   className="rounded-full bg-white px-5 py-2 text-sm text-black transition-colors hover:bg-white/90"
                   style={{ fontFamily: 'system-ui, sans-serif' }}
                 >
                   Get Started
-                </button>
+                </a>
               </div>
             </div>
 
@@ -143,16 +144,20 @@ export default function LandingPage() {
                     {link}
                   </a>
                 ))}
-                <button
-                  className="animate-menu-scale-in rounded-full bg-white px-8 py-3 text-lg text-black"
+                <a
+                  href="/auth/register"
+                  className="animate-menu-scale-in rounded-full bg-white px-8 py-3 text-lg text-black transition-colors hover:bg-white/90"
                   style={{
                     fontFamily: 'system-ui, sans-serif',
                     animationDelay: '300ms',
                   }}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = '/auth/register';
+                  }}
                 >
                   Get Started
-                </button>
+                </a>
               </div>
             </div>
           )}
@@ -317,9 +322,16 @@ export default function LandingPage() {
                 <div className="flex justify-center">
                   <div className="liquid-glass rounded-xl p-8">
                     <h3 className="mb-4 text-2xl font-semibold">Get Started Today</h3>
-                    <button className="rounded-full bg-white px-8 py-3 text-lg text-black transition-colors hover:bg-white/90">
+                    <a
+                      href="/auth/register"
+                      className="rounded-full bg-white px-8 py-3 text-lg text-black transition-colors hover:bg-white/90"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.href = '/auth/register';
+                      }}
+                    >
                       Join Community
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
