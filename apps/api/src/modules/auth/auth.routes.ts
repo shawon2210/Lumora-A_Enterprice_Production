@@ -1,4 +1,5 @@
 ﻿import { Router } from 'express';
+import passport from 'passport';
 import { authController } from './auth.controller';
 import { authenticate } from '@/middleware/auth';
 import { validate } from '@/middleware/validate';
@@ -130,7 +131,11 @@ router.post(
  *       200:
  *         description: Password reset successfully
  */
-router.post('/reset-password', validate({ body: resetPasswordSchema }), authController.resetPassword);
+router.post(
+  '/reset-password',
+  validate({ body: resetPasswordSchema }),
+  authController.resetPassword,
+);
 
 /**
  * @openapi
@@ -153,10 +158,13 @@ router.get('/me', authenticate, authController.getMe);
  *     tags: [Auth]
  *     summary: Google OAuth login
  *     responses:
- *       200:
- *         description: Google OAuth endpoint
+ *       302:
+ *         description: Redirect to Google
  */
-router.get('/google', authController.googleAuth);
+router.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false }),
+);
 
 /**
  * @openapi
@@ -165,10 +173,14 @@ router.get('/google', authController.googleAuth);
  *     tags: [Auth]
  *     summary: Google OAuth callback
  *     responses:
- *       200:
- *         description: Google OAuth callback
+ *       302:
+ *         description: Redirect to frontend with tokens
  */
-router.get('/google/callback', authController.googleCallback);
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+  authController.oauthCallback,
+);
 
 /**
  * @openapi
@@ -177,10 +189,10 @@ router.get('/google/callback', authController.googleCallback);
  *     tags: [Auth]
  *     summary: GitHub OAuth login
  *     responses:
- *       200:
- *         description: GitHub OAuth endpoint
+ *       302:
+ *         description: Redirect to GitHub
  */
-router.get('/github', authController.githubAuth);
+router.get('/github', passport.authenticate('github', { scope: ['user:email'], session: false }));
 
 /**
  * @openapi
@@ -189,9 +201,13 @@ router.get('/github', authController.githubAuth);
  *     tags: [Auth]
  *     summary: GitHub OAuth callback
  *     responses:
- *       200:
- *         description: GitHub OAuth callback
+ *       302:
+ *         description: Redirect to frontend with tokens
  */
-router.get('/github/callback', authController.githubCallback);
+router.get(
+  '/github/callback',
+  passport.authenticate('github', { session: false, failureRedirect: '/login' }),
+  authController.oauthCallback,
+);
 
 export default router;

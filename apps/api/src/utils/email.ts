@@ -12,7 +12,9 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const { resendApiKey, from } = config.email;
 
   if (!resendApiKey) {
-    // Development mode: log email instead of sending
+    console.warn(
+      '[EMAIL] Resend API key not configured — email not sent (dev mode). Set RESEND_API_KEY in production.',
+    );
     console.log(`[EMAIL] To: ${options.to}`);
     console.log(`[EMAIL] Subject: ${options.subject}`);
     console.log(`[EMAIL] HTML: ${options.html}`);

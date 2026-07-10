@@ -1,6 +1,7 @@
 import { mediaRepository } from './media.repository';
 import { getPaginationParams, buildPaginationMeta } from '@/utils/pagination';
 import { NotFoundError, ForbiddenError } from '@/utils/errors';
+import { cloudinaryService } from '@/utils/cloudinary';
 import type { MediaType } from '@prisma/client';
 
 function getMediaType(mimeType: string): string {
@@ -24,7 +25,7 @@ export const mediaService = {
 
   async uploadMedia(userId: string, file: Express.Multer.File) {
     const type = getMediaType(file.mimetype) as MediaType;
-    const url = `https://res.cloudinary.com/lumora/image/upload/v1/${userId}/${Date.now()}_${file.originalname}`;
+    const { url } = await cloudinaryService.upload(file);
     return mediaRepository.createMedia({
       url,
       type,

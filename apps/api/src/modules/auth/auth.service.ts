@@ -89,7 +89,7 @@ export const authService = {
       expiresAt,
     );
 
-    const refreshedUser = await authRepository.findUserByEmail(payload.sub);
+    const refreshedUser = await authRepository.findUserById(payload.sub);
     if (!refreshedUser) {
       throw new UnauthorizedError('User not found');
     }

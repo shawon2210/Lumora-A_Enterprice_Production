@@ -71,6 +71,7 @@ async function main() {
       content: '<p>This is the first post on Lumora...</p>',
       status: 'PUBLISHED' as const,
       authorId: admin.id,
+      tagNames: ['Technology'],
     },
     {
       title: 'Getting Started Guide',
@@ -79,18 +80,29 @@ async function main() {
       content: '<p>Here is your guide to getting started...</p>',
       status: 'PUBLISHED' as const,
       authorId: user.id,
+      tagNames: ['Development'],
     },
   ];
 
   for (const post of samplePosts) {
+    const { tagNames, ...postData } = post;
     const existing = await prisma.blogPost.findUnique({ where: { slug: post.slug } });
     if (!existing) {
+      const tagRecords = await Promise.all(
+        tagNames.map(async (name) =>
+          prisma.blogTag.upsert({
+            where: { slug: name.toLowerCase() },
+            update: {},
+            create: { name, slug: name.toLowerCase() },
+          }),
+        ),
+      );
       await prisma.blogPost.create({
         data: {
-          ...post,
+          ...postData,
           publishedAt: new Date(),
           tags: {
-            create: [{ tag: { connect: { slug: 'getting-started-guide' } } }],
+            create: tagRecords.map((tag) => ({ tag: { connect: { id: tag.id } } })),
           },
         },
       });

@@ -5,9 +5,11 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import passport from 'passport';
 import swaggerUi from 'swagger-ui-express';
 import { config } from '@/config/env';
 import { swaggerSpec } from '@/config/swagger';
+import { configurePassport } from '@/config/passport';
 import { errorHandler } from '@/middleware/error-handler';
 import { securityHeaders } from '@/middleware/security';
 import { generateCsrfToken } from '@/middleware/csrf';
@@ -39,6 +41,10 @@ app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(config.nodeEnv === 'production' ? 'combined' : 'dev'));
+
+// Passport initialization for OAuth
+configurePassport();
+app.use(passport.initialize());
 
 // Generate CSRF tokens for authenticated routes
 app.use(generateCsrfToken);

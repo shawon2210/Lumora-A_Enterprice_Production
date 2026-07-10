@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -10,7 +8,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-lumora}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./packages/database/prisma:/var/lib/postgresql/prisma
     ports:
       - '5432:5432'
     healthcheck:

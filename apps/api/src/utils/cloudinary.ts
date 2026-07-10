@@ -15,10 +15,12 @@ class CloudinaryService {
 
   async upload(_file: Express.Multer.File): Promise<{ url: string; publicId: string }> {
     if (!this.isConfigured) {
-      // Development: Return mock URL
+      console.warn(
+        '[CLOUDINARY] Cloudinary not configured — returning placeholder URL (dev mode). Set CLOUDINARY_* env vars in production.',
+      );
       return {
         url: `https://via.placeholder.com/800x600?text=${encodeURIComponent(randomBytes(8).toString('hex'))}`,
-        publicId: `mock-${Date.now()}`,
+        publicId: `dev-${Date.now()}`,
       };
     }
 

@@ -99,25 +99,15 @@ export const authController = {
     }
   },
 
-  googleAuth(_req: Request, res: Response) {
-    sendMessage(
-      res,
-      'Google OAuth requires Passport.js setup. Use GET /api/v1/auth/google with proper configuration.',
-    );
-  },
-
-  googleCallback(_req: Request, res: Response) {
-    sendMessage(res, 'Google OAuth callback requires Passport.js setup.');
-  },
-
-  githubAuth(_req: Request, res: Response) {
-    sendMessage(
-      res,
-      'GitHub OAuth requires Passport.js setup. Use GET /api/v1/auth/github with proper configuration.',
-    );
-  },
-
-  githubCallback(_req: Request, res: Response) {
-    sendMessage(res, 'GitHub OAuth callback requires Passport.js setup.');
+  async oauthCallback(req: Request, res: Response) {
+    const result = req.user as any;
+    if (!result) {
+      return res.redirect(`${config.frontendUrl}/login?error=oauth_failed`);
+    }
+    res.cookie(REFRESH_COOKIE_NAME, result.refreshToken, {
+      ...COOKIE_OPTIONS,
+      maxAge: config.session.rememberMeDays * 24 * 60 * 60 * 1000,
+    });
+    res.redirect(`${config.frontendUrl}/auth/callback?accessToken=${result.accessToken}`);
   },
 };

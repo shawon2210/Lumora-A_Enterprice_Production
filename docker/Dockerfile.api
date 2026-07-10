@@ -8,17 +8,23 @@ RUN npm install -g pnpm@10
 
 # Install dependencies
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages/config/package.json ./packages/config/
 COPY packages/database/package.json ./packages/database/
+COPY packages/database/prisma ./packages/database/prisma
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/validators/package.json ./packages/validators/
 COPY packages/ui/package.json ./packages/ui/
 COPY apps/api/package.json ./apps/api/
 RUN pnpm install --frozen-lockfile
 
+# Generate Prisma client
+RUN pnpm --filter @lumora/database db:generate
+
 # Build
 COPY . .
 RUN pnpm build
+
+# Regenerate Prisma client after build (ensures correct output dirs)
+RUN pnpm --filter @lumora/database db:generate
 
 # Production image
 FROM node:20-alpine AS production
@@ -28,6 +34,7 @@ RUN npm install -g pnpm@10
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/database/package.json ./packages/database/
+COPY packages/database/prisma ./packages/database/prisma
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/validators/package.json ./packages/validators/
 COPY packages/ui/package.json ./packages/ui/
@@ -35,10 +42,14 @@ COPY apps/api/package.json ./apps/api/
 
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=base /app/packages/database/dist ./packages/database/dist
+COPY --from=base /app/packages/database/node_modules/.prisma ./packages/database/node_modules/.prisma
 COPY --from=base /app/packages/shared/dist ./packages/shared/dist
 COPY --from=base /app/packages/validators/dist ./packages/validators/dist
 COPY --from=base /app/packages/ui/dist ./packages/ui/dist
 COPY --from=base /app/apps/api/dist ./apps/api/dist
+
+# Generate Prisma client for production
+RUN pnpm --filter @lumora/database db:generate
 
 EXPOSE 4000
 
