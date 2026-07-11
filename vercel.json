@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npx turbo build --filter=@lumora/web",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "npx pnpm install --no-frozen-lockfile",
+  "ignoreCommand": "npx turbo-ignore"
+}
