@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
 import { Menu, X } from 'lucide-react';
 import { SEO } from '@/components/seo';
+import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 
 const videoUrls = [
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_081127_0992a171-d3c6-4978-8213-0ec5df8b6d63.mp4',
@@ -10,7 +11,12 @@ const videoUrls = [
 ];
 
 const videoLabels = ['Golden Hour', 'Still Water', 'Deep Woods', 'Quiet Dawn'];
-const navLinks = ['How It Works', 'Features', 'Pricing', 'Community'];
+const navLinks = [
+  { label: 'How It Works', path: '/how-it-works' },
+  { label: 'Features', path: '/features' },
+  { label: 'Pricing', path: '/pricing' },
+  { label: 'Community', path: '/community' },
+];
 
 export default function LandingPage() {
   const [activeVideo, setActiveVideo] = useState(0);
@@ -80,22 +86,22 @@ export default function LandingPage() {
             <div className="hidden items-center md:flex">
               <div className="liquid-glass flex items-center gap-1 rounded-full px-2 py-2">
                 {navLinks.map((link, index) => (
-                  <a
+                  <Link
                     key={index}
-                    href="#{link.toLowerCase().replace(' ', '-')}"
+                    to={link.path}
                     className="rounded-full px-4 py-2 text-sm text-white/90 transition-colors hover:text-white"
                     style={{ fontFamily: 'system-ui, sans-serif' }}
                   >
-                    {link}
-                  </a>
+                    {link.label}
+                  </Link>
                 ))}
-                <a
-                  href="/auth/register"
+                <Link
+                  to="/auth/register"
                   className="rounded-full bg-white px-5 py-2 text-sm text-black transition-colors hover:bg-white/90"
                   style={{ fontFamily: 'system-ui, sans-serif' }}
                 >
                   Get Started
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -128,21 +134,18 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-8">
                 {navLinks.map((link, i) => (
-                  <a
-                    key={link}
-                    href="#{link.toLowerCase().replace(' ', '-')}"
+                  <Link
+                    key={link.path}
+                    to={link.path}
                     className="animate-menu-slide-up text-3xl text-white"
                     style={{
                       fontFamily: 'system-ui, sans-serif',
                       animationDelay: `${(i + 2) * 50}ms`,
                     }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setMobileMenuOpen(false);
-                    }}
+                    onClick={() => setMobileMenuOpen(false)}
                   >
-                    {link}
-                  </a>
+                    {link.label}
+                  </Link>
                 ))}
                 <a
                   href="/auth/register"

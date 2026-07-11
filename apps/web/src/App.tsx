@@ -22,6 +22,10 @@ const SettingsPage = lazy(() => import('@/pages/dashboard/settings'));
 const AdminUsersPage = lazy(() => import('@/pages/admin/users'));
 const AdminAnalyticsPage = lazy(() => import('@/pages/admin/analytics'));
 const AdminLogsPage = lazy(() => import('@/pages/admin/logs'));
+const HowItWorksPage = lazy(() => import('@/pages/how-it-works'));
+const FeaturesPage = lazy(() => import('@/pages/features'));
+const PricingPage = lazy(() => import('@/pages/pricing'));
+const CommunityPage = lazy(() => import('@/pages/community'));
 
 function Lazy({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<LoadingScreen />}>{children}</Suspense>;
@@ -32,12 +36,49 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <LandingPage /> },
-      { path: 'auth', element: <AuthLayout /> },
-      { path: 'auth/login', element: <LoginPage /> },
-      { path: 'auth/register', element: <RegisterPage /> },
-      { path: 'auth/forgot-password', element: <ForgotPasswordPage /> },
-      { path: 'auth/reset-password', element: <ResetPasswordPage /> },
       { path: 'auth/callback', element: <AuthCallbackPage /> },
+      {
+        path: 'how-it-works',
+        element: (
+          <Lazy>
+            <HowItWorksPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'features',
+        element: (
+          <Lazy>
+            <FeaturesPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'pricing',
+        element: (
+          <Lazy>
+            <PricingPage />
+          </Lazy>
+        ),
+      },
+      {
+        path: 'community',
+        element: (
+          <Lazy>
+            <CommunityPage />
+          </Lazy>
+        ),
+      },
+      { path: 'auth/callback', element: <AuthCallbackPage /> },
+      {
+        element: <AuthLayout />,
+        children: [
+          { path: 'login', element: <LoginPage /> },
+          { path: 'register', element: <RegisterPage /> },
+          { path: 'forgot-password', element: <ForgotPasswordPage /> },
+          { path: 'reset-password', element: <ResetPasswordPage /> },
+        ],
+      },
       {
         element: <ProtectedRoute />,
         children: [
