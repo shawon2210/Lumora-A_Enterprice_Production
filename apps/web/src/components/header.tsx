@@ -38,7 +38,7 @@ export function Header() {
               </Link>
             ))}
             <Link
-              to="/auth/register"
+              to="/register"
               className="rounded-full bg-white px-5 py-2 text-sm text-black transition-colors hover:bg-white/90"
               style={{ fontFamily: 'system-ui, sans-serif' }}
             >
@@ -88,7 +88,7 @@ export function Header() {
               </Link>
             ))}
             <Link
-              to="/auth/register"
+              to="/register"
               className="animate-menu-scale-in rounded-full bg-white px-8 py-3 text-lg text-black transition-colors hover:bg-white/90"
               style={{
                 fontFamily: 'system-ui, sans-serif',

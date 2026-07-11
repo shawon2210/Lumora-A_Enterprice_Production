@@ -208,7 +208,7 @@ export default function PricingPage() {
                 </ul>
 
                 <Link
-                  to={plan.name === 'Enterprise' ? '/contact' : '/auth/register'}
+                  to={plan.name === 'Enterprise' ? '/contact' : '/register'}
                   className={`block w-full rounded-xl py-4 text-center text-base font-semibold transition-all ${
                     plan.popular
                       ? 'bg-white text-black hover:bg-white/90'
@@ -254,7 +254,7 @@ export default function PricingPage() {
               Start your 14-day free trial. No credit card required. Cancel anytime.
             </p>
             <Link
-              to="/auth/register"
+              to="/register"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-4 text-base font-semibold text-black transition-all hover:scale-105 hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
             >
               Start Free Trial

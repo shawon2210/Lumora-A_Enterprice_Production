@@ -106,7 +106,7 @@ export default function HowItWorksPage() {
           {/* CTA */}
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              to="/auth/register"
+              to="/register"
               className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-4 text-base font-semibold text-black transition-all hover:scale-105 hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
             >
               Get Started Free
@@ -222,7 +222,7 @@ export default function HowItWorksPage() {
               Join thousands of creators who trust Lumora to power their content. Start free, scale infinitely.
             </p>
             <Link
-              to="/auth/register"
+              to="/register"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-4 text-base font-semibold text-black transition-all hover:scale-105 hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
             >
               Start Free Today

@@ -106,7 +106,7 @@ export default function CommunityPage() {
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              to="/auth/register"
+              to="/register"
               className="group inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-8 py-4 text-base font-semibold text-black transition-all hover:scale-105 hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-black"
             >
               Join Free
@@ -252,7 +252,7 @@ export default function CommunityPage() {
               Connect with 50K+ creators, share your journey, and grow together. Your tribe is waiting.
             </p>
             <Link
-              to="/auth/register"
+              to="/register"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-8 py-4 text-base font-semibold text-black transition-all hover:scale-105 hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-black"
             >
               Join Free Today
