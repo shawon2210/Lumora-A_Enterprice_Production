@@ -1,11 +1,11 @@
 import type { Request, Response, NextFunction } from 'express';
 import { blogService } from './blog.service';
-import { sendPaginated, sendSuccess, sendMessage } from '@/utils/response';
+import { sendSuccess, sendMessage } from '@/utils/response';
 
 export async function listPosts(req: Request, res: Response, next: NextFunction) {
   try {
     const result = await blogService.listPosts(req.query);
-    sendPaginated(res, result.posts, result.meta);
+    sendSuccess(res, { posts: result.posts, meta: result.meta });
   } catch (err) {
     next(err);
   }
@@ -14,6 +14,15 @@ export async function listPosts(req: Request, res: Response, next: NextFunction)
 export async function getPost(req: Request, res: Response, next: NextFunction) {
   try {
     const post = await blogService.getPost(req.params.slug as string);
+    sendSuccess(res, post);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getPostById(req: Request, res: Response, next: NextFunction) {
+  try {
+    const post = await blogService.getPostById(req.params.id as string);
     sendSuccess(res, post);
   } catch (err) {
     next(err);

@@ -13,7 +13,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useAdminUsers, useUpdateUserRole, useDeleteUser, useDebounce } from '@/hooks';
-import { Card, Badge, Button, Skeleton } from '@lumora/ui';
+import { Card, Badge, Button, Skeleton, toast } from '@lumora/ui';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -166,7 +166,10 @@ function UsersContent() {
           </select>
         </div>
 
-        <Button className="gap-2 rounded-xl bg-white text-neutral-900 hover:bg-white/90">
+        <Button
+          className="gap-2 rounded-xl bg-white text-neutral-900 hover:bg-white/90"
+          onClick={() => toast({ title: 'Invite feature coming soon' })}
+        >
           <UserCog className="h-4 w-4" />
           Invite User
         </Button>
@@ -195,20 +198,14 @@ function UsersContent() {
               {users.map((user) => {
                 const initials = (user.name ?? user.email).slice(0, 2).toUpperCase();
                 return (
-                  <motion.tr
-                    key={user.id}
-                    variants={item}
-                    className="hover:bg-surface-secondary/50 transition-colors"
-                  >
+                  <motion.tr key={user.id} variants={item} className="hover:bg-surface-secondary/50 transition-colors">
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
                         <div className="from-primary-500/20 to-primary-400/20 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br text-xs font-medium text-white/70">
                           {initials}
                         </div>
                         <div>
-                          <p className="text-text-primary text-sm font-medium">
-                            {user.name ?? 'Unnamed'}
-                          </p>
+                          <p className="text-text-primary text-sm font-medium">{user.name ?? 'Unnamed'}</p>
                           <p className="text-text-tertiary text-xs">{user.email}</p>
                         </div>
                       </div>
@@ -240,9 +237,7 @@ function UsersContent() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             disabled={user.role === 'ADMIN'}
-                            onClick={() =>
-                              handleRoleChange(user, user.role === 'USER' ? 'MODERATOR' : 'USER')
-                            }
+                            onClick={() => handleRoleChange(user, user.role === 'USER' ? 'MODERATOR' : 'USER')}
                           >
                             <Shield className="mr-2 h-4 w-4" />
                             {user.role === 'USER' ? 'Make Moderator' : 'Make User'}
@@ -276,8 +271,8 @@ function UsersContent() {
         {totalPages > 1 && (
           <div className="border-border-secondary flex items-center justify-between border-t px-5 py-3.5">
             <p className="text-text-tertiary text-xs">
-              Showing {(page - 1) * ITEMS_PER_PAGE + 1}-
-              {Math.min(page * ITEMS_PER_PAGE, meta?.total ?? 0)} of {meta?.total ?? 0}
+              Showing {(page - 1) * ITEMS_PER_PAGE + 1}-{Math.min(page * ITEMS_PER_PAGE, meta?.total ?? 0)} of{' '}
+              {meta?.total ?? 0}
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -317,20 +312,14 @@ function UsersContent() {
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {deleteTarget?.name ?? deleteTarget?.email}? This
-              action cannot be undone.
+              Are you sure you want to delete {deleteTarget?.name ?? deleteTarget?.email}? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleteMutation.isPending}
-              className="gap-2"
-            >
+            <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending} className="gap-2">
               {deleteMutation.isPending ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (

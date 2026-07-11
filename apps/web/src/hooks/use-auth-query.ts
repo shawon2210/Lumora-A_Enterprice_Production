@@ -4,7 +4,6 @@ import type { User } from '@lumora/shared';
 interface AuthResponse {
   user: User;
   accessToken: string;
-  refreshToken: string;
 }
 
 export function useMe() {
@@ -15,18 +14,17 @@ export function useMe() {
 }
 
 export function useLogin() {
-  return useApiMutation<AuthResponse, { email: string; password: string }>('post', '/auth/login');
+  return useApiMutation<AuthResponse, { email: string; password: string; rememberMe?: boolean }>('post', '/auth/login');
 }
 
 export function useRegister() {
-  return useApiMutation<AuthResponse, { email: string; password: string; name: string }>(
-    'post',
-    '/auth/register',
-  );
+  return useApiMutation<AuthResponse, { email: string; password: string; name: string }>('post', '/auth/register');
 }
 
 export function useLogout() {
-  return useApiMutation<void>('post', '/auth/logout');
+  return useApiMutation<void>('post', '/auth/logout', {
+    invalidationKey: ['auth', 'me'],
+  });
 }
 
 export function useForgotPassword() {

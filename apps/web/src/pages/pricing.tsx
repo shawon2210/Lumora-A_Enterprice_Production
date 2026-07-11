@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Check as CheckIcon } from 'lucide-react';
 import { SEO } from '@/components/seo';
 import { Link } from 'react-router-dom';
@@ -93,6 +94,7 @@ const faqs = [
 ];
 
 export default function PricingPage() {
+  const [annual, setAnnual] = useState(false);
   return (
     <>
       <SEO
@@ -132,14 +134,19 @@ export default function PricingPage() {
 
           {/* Billing Toggle */}
           <div className="mb-16 flex items-center justify-center gap-4">
-            <span className="text-white/70">Monthly</span>
-            <div className="relative inline-flex h-7 w-12 items-center rounded-full bg-white/10">
+            <span className={`${annual ? 'text-white/50' : 'text-white'}`}>Monthly</span>
+            <button
+              onClick={() => setAnnual(!annual)}
+              className="relative inline-flex h-7 w-12 cursor-pointer items-center rounded-full bg-white/10"
+              role="switch"
+              aria-checked={annual}
+              aria-label="Toggle annual billing"
+            >
               <div
-                className="relative z-10 inline-block h-5 w-11 transform rounded-full bg-emerald-500 transition-transform"
-                style={{ transform: 'translateX(20px)' }}
+                className={`inline-block h-5 w-5 transform rounded-full bg-emerald-500 transition-transform ${annual ? 'translate-x-6' : 'translate-x-1'}`}
               />
-            </div>
-            <span className="font-medium text-emerald-400">
+            </button>
+            <span className={`font-medium ${annual ? 'text-emerald-400' : 'text-white/50'}`}>
               Annual <span className="text-sm text-emerald-400/80">(Save 20%)</span>
             </span>
           </div>
@@ -174,8 +181,14 @@ export default function PricingPage() {
 
                 <div className="mb-8">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-bold text-white">{plan.price}</span>
-                    <span className="mb-1 self-end text-white/50">{plan.period}</span>
+                    <span className="text-5xl font-bold text-white">
+                      {annual && plan.price !== '$0'
+                        ? `$${Math.round(parseInt(plan.price.slice(1)) * 12 * 0.8)}`
+                        : plan.price}
+                    </span>
+                    <span className="mb-1 self-end text-white/50">
+                      {annual && plan.price !== '$0' ? '/year' : plan.period}
+                    </span>
                   </div>
                   {plan.name === 'Free' && (
                     <p className="mt-2 text-sm font-medium text-emerald-400">No credit card required</p>

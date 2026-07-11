@@ -7,6 +7,7 @@ import { Eye, EyeOff, Lock, CheckCircle, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
 import { useResetPassword } from '@/hooks';
 import { Button } from '@lumora/ui';
+import type { ApiClientError } from '@/services/api-client';
 
 const resetPasswordSchema = z
   .object({
@@ -37,7 +38,7 @@ export default function ResetPasswordPage() {
     try {
       await resetPasswordMutation.mutateAsync({ token, password: data.password });
       setSubmitted(true);
-    } catch (err: any) {
+    } catch {
       // error is surfaced via mutation state
     }
   };
@@ -54,9 +55,7 @@ export default function ResetPasswordPage() {
         >
           <AlertCircle className="mx-auto mb-4 h-12 w-12 text-amber-400" />
           <h1 className="text-2xl font-semibold text-white">Invalid Reset Link</h1>
-          <p className="mt-2 text-sm text-white/60">
-            This password reset link is invalid or has expired.
-          </p>
+          <p className="mt-2 text-sm text-white/60">This password reset link is invalid or has expired.</p>
           <div className="mt-6">
             <Link
               to="/forgot-password"
@@ -66,10 +65,7 @@ export default function ResetPasswordPage() {
             </Link>
           </div>
           <div className="mt-4">
-            <Link
-              to="/login"
-              className="text-sm text-white/40 transition-colors hover:text-white/60"
-            >
+            <Link to="/login" className="text-sm text-white/40 transition-colors hover:text-white/60">
               Back to sign in
             </Link>
           </div>
@@ -90,18 +86,12 @@ export default function ResetPasswordPage() {
         className="glass-card w-full max-w-md p-8"
       >
         <div className="mb-8 text-center">
-          <Link
-            to="/"
-            className="text-2xl italic text-white"
-            style={{ fontFamily: "'Instrument Serif', serif" }}
-          >
+          <Link to="/" className="text-2xl italic text-white" style={{ fontFamily: "'Instrument Serif', serif" }}>
             Lumora
           </Link>
           <h1 className="mt-6 text-2xl font-semibold text-white">Reset your password</h1>
           <p className="mt-2 text-sm text-white/60">
-            {submitted
-              ? 'Your password has been reset successfully'
-              : 'Enter your new password below'}
+            {submitted ? 'Your password has been reset successfully' : 'Enter your new password below'}
           </p>
         </div>
 
@@ -130,7 +120,7 @@ export default function ResetPasswordPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400"
           >
-            {(resetPasswordMutation.error as any)?.message || 'Failed to reset password'}
+            {(resetPasswordMutation.error as ApiClientError)?.message || 'Failed to reset password'}
           </motion.div>
         )}
 
@@ -159,17 +149,12 @@ export default function ResetPasswordPage() {
                 </button>
               </div>
               {form.formState.errors.password && (
-                <p className="mt-1 text-xs text-red-400">
-                  {form.formState.errors.password.message}
-                </p>
+                <p className="mt-1 text-xs text-red-400">{form.formState.errors.password.message}</p>
               )}
             </div>
 
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="mb-1.5 block text-sm font-medium text-white/80"
-              >
+              <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-white/80">
                 Confirm Password
               </label>
               <div className="relative">
@@ -187,17 +172,11 @@ export default function ResetPasswordPage() {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 transition-colors hover:text-white/60"
                   tabIndex={-1}
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
               {form.formState.errors.confirmPassword && (
-                <p className="mt-1 text-xs text-red-400">
-                  {form.formState.errors.confirmPassword.message}
-                </p>
+                <p className="mt-1 text-xs text-red-400">{form.formState.errors.confirmPassword.message}</p>
               )}
             </div>
 
@@ -213,10 +192,7 @@ export default function ResetPasswordPage() {
 
         {!submitted && (
           <div className="mt-6 text-center">
-            <Link
-              to="/login"
-              className="text-sm text-white/40 transition-colors hover:text-white/60"
-            >
+            <Link to="/login" className="text-sm text-white/40 transition-colors hover:text-white/60">
               Back to sign in
             </Link>
           </div>

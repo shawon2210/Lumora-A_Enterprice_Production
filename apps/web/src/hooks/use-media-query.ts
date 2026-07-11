@@ -13,5 +13,7 @@ export function useMedia(params?: { page?: number; type?: string; search?: strin
 }
 
 export function useDeleteMedia() {
-  return useApiMutationWithUrl<void, { id: string }>('delete', (vars) => `/media/${vars.id}`);
+  return useApiMutationWithUrl<void, { id: string }>('delete', (vars) => `/media/${vars.id}`, {
+    invalidationKey: ['media'],
+  });
 }

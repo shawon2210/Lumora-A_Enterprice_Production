@@ -1,29 +1,67 @@
 import { useEffect, type ReactNode } from 'react';
 import { useAuthStore } from '@/store/auth-store';
-import { api } from '@/services/api-client';
-import type { User } from '@lumora/shared';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const setUser = useAuthStore((s) => s.setUser);
+  const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const setLoading = useAuthStore((s) => s.setLoading);
   const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
-    const token = localStorage.getItem('lumora_access_token');
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    const accessToken = useAuthStore.getState().accessToken;
 
-    api
-      .get<User>('/auth/me')
-      .then((user) => setUser(user))
-      .catch(() => {
-        localStorage.removeItem('lumora_access_token');
-        localStorage.removeItem('lumora_refresh_token');
+    if (!accessToken) {
+      try {
+        fetch(`${import.meta.env.VITE_API_URL || '/api/v1'}/auth/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error('Refresh failed');
+            return res.json();
+          })
+          .then((json) => {
+            const token = json.data?.accessToken || json.accessToken;
+            if (token) {
+              setAccessToken(token);
+              return fetch(`${import.meta.env.VITE_API_URL || '/api/v1'}/auth/me`, {
+                headers: { Authorization: `Bearer ${token}` },
+                credentials: 'include',
+              });
+            }
+            throw new Error('No token');
+          })
+          .then((res) => {
+            if (!res.ok) throw new Error('Failed to fetch user');
+            return res.json();
+          })
+          .then((json) => {
+            setUser(json.data || json);
+          })
+          .catch(() => {
+            setLoading(false);
+          });
+      } catch {
         setLoading(false);
-      });
-  }, [setUser, setLoading]);
+      }
+    } else {
+      fetch(`${import.meta.env.VITE_API_URL || '/api/v1'}/auth/me`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        credentials: 'include',
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error('Failed to fetch user');
+          return res.json();
+        })
+        .then((json) => {
+          setUser(json.data || json);
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+    }
+  }, [setUser, setAccessToken, setLoading]);
 
   useEffect(() => {
     const handleLogout = () => logout();

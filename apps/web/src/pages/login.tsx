@@ -8,10 +8,11 @@ import { loginSchema, type LoginInput } from '@lumora/validators';
 import { useLogin } from '@/hooks';
 import { useAuthStore } from '@/store/auth-store';
 import { Button } from '@lumora/ui';
+import type { ApiClientError } from '@/services/api-client';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const setTokens = useAuthStore((s) => s.setTokens);
+  const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const setRememberMe = useAuthStore((s) => s.setRememberMe);
   const rememberMe = useAuthStore((s) => s.rememberMe);
   const loginMutation = useLogin();
@@ -30,10 +31,10 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginInput) => {
     try {
-      const response = await loginMutation.mutateAsync(data);
-      setTokens(response.accessToken, response.refreshToken);
+      const response = await loginMutation.mutateAsync({ ...data, rememberMe });
+      setAccessToken(response.accessToken);
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch {
       // error is surfaced via mutation state
     }
   };
@@ -52,11 +53,7 @@ export default function LoginPage() {
       >
         {/* Header */}
         <div className="mb-8 text-center">
-          <Link
-            to="/"
-            className="text-2xl italic text-white"
-            style={{ fontFamily: "'Instrument Serif', serif" }}
-          >
+          <Link to="/" className="text-2xl italic text-white" style={{ fontFamily: "'Instrument Serif', serif" }}>
             Lumora
           </Link>
           <h1 className="mt-6 text-2xl font-semibold text-white">Welcome back</h1>
@@ -116,7 +113,7 @@ export default function LoginPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400"
           >
-            {(loginMutation.error as any)?.message || 'Invalid email or password'}
+            {(loginMutation.error as ApiClientError)?.message || 'Invalid email or password'}
           </motion.div>
         )}
 
@@ -178,10 +175,7 @@ export default function LoginPage() {
               />
               Remember me
             </label>
-            <Link
-              to="/forgot-password"
-              className="text-primary-400 hover:text-primary-300 text-sm transition-colors"
-            >
+            <Link to="/forgot-password" className="text-primary-400 hover:text-primary-300 text-sm transition-colors">
               Forgot password?
             </Link>
           </div>
@@ -197,10 +191,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-white/40">
           Don&apos;t have an account?{' '}
-          <Link
-            to="/register"
-            className="text-primary-400 hover:text-primary-300 font-medium transition-colors"
-          >
+          <Link to="/register" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
             Create one
           </Link>
         </p>

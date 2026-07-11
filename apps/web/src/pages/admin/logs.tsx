@@ -14,7 +14,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useAuditLogs, useDebounce } from '@/hooks';
-import { Card, Badge, Button, Skeleton } from '@lumora/ui';
+import { Card, Badge, Button, Skeleton, toast } from '@lumora/ui';
 import { ErrorBoundary } from '@/components/error-boundary';
 
 type Severity = 'info' | 'warning' | 'error';
@@ -28,10 +28,7 @@ const actionConfig: Record<string, { icon: typeof Shield; label: string }> = {
   settings: { icon: Settings, label: 'Settings' },
 };
 
-const severityBadge: Record<
-  string,
-  { label: string; variant: 'default' | 'secondary' | 'destructive' }
-> = {
+const severityBadge: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' }> = {
   info: { label: 'Info', variant: 'secondary' },
   warning: { label: 'Warning', variant: 'default' },
   error: { label: 'Error', variant: 'destructive' },
@@ -59,10 +56,12 @@ interface LogDisplay {
 
 function LogsContent() {
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const debouncedSearch = useDebounce(search, 300);
 
   const { data, isLoading, isError, refetch } = useAuditLogs({
+    page,
     search: debouncedSearch || undefined,
     severity: severityFilter !== 'all' ? severityFilter : undefined,
   });
@@ -122,9 +121,7 @@ function LogsContent() {
         <div className="text-center">
           <AlertCircle className="text-error mx-auto h-12 w-12" />
           <h2 className="text-text-primary mt-4 text-lg font-semibold">Failed to load logs</h2>
-          <p className="text-text-secondary mt-2 text-sm">
-            There was an error fetching audit logs.
-          </p>
+          <p className="text-text-secondary mt-2 text-sm">There was an error fetching audit logs.</p>
           <Button onClick={() => refetch()} className="mt-6 gap-2">
             <RefreshCw className="h-4 w-4" />
             Try again
@@ -138,9 +135,7 @@ function LogsContent() {
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
       <div>
         <h1 className="text-text-primary text-2xl font-semibold">Audit Logs</h1>
-        <p className="text-text-secondary mt-1 text-sm">
-          Track all activities and changes across the platform.
-        </p>
+        <p className="text-text-secondary mt-1 text-sm">Track all activities and changes across the platform.</p>
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -172,10 +167,15 @@ function LogsContent() {
             <Calendar className="text-text-tertiary pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
             <input
               type="date"
+              onChange={() => toast({ title: 'Date filter coming soon' })}
               className="border-border-secondary bg-surface-secondary text-text-primary rounded-xl border py-2 pl-10 pr-4 text-sm outline-none"
             />
           </div>
-          <Button variant="outline" className="gap-2 rounded-xl text-sm">
+          <Button
+            variant="outline"
+            className="gap-2 rounded-xl text-sm"
+            onClick={() => toast({ title: 'Export coming soon' })}
+          >
             <Download className="h-4 w-4" />
             Export
           </Button>
@@ -211,14 +211,8 @@ function LogsContent() {
               {logs.map((log) => {
                 const action = actionConfig[log.action] ?? { icon: Shield, label: log.action };
                 return (
-                  <motion.tr
-                    key={log.id}
-                    variants={item}
-                    className="hover:bg-surface-secondary/50 transition-colors"
-                  >
-                    <td className="text-text-secondary px-5 py-3.5 font-mono text-xs">
-                      {log.timestamp}
-                    </td>
+                  <motion.tr key={log.id} variants={item} className="hover:bg-surface-secondary/50 transition-colors">
+                    <td className="text-text-secondary px-5 py-3.5 font-mono text-xs">{log.timestamp}</td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-2">
                         <User className="text-text-tertiary h-3.5 w-3.5" />
@@ -257,6 +251,29 @@ function LogsContent() {
             <p className="text-text-tertiary text-xs">
               Showing {logs.length} of {data.meta.total} entries
             </p>
+            {data.meta.totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                >
+                  Previous
+                </Button>
+                <span className="text-text-tertiary text-xs">
+                  Page {data.meta.page} of {data.meta.totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= data.meta.totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </Card>

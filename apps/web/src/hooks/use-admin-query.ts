@@ -16,12 +16,7 @@ interface AuditLogItem {
   createdAt: string;
 }
 
-export function useAdminUsers(params?: {
-  page?: number;
-  limit?: number;
-  search?: string;
-  role?: string;
-}) {
+export function useAdminUsers(params?: { page?: number; limit?: number; search?: string; role?: string }) {
   return useApiQuery<UsersResponse>(['admin', 'users'], '/admin/users', {
     params: params as Record<string, string | number | undefined>,
   });
@@ -32,14 +27,15 @@ export function useAdminUser(id: string) {
 }
 
 export function useUpdateUserRole() {
-  return useApiMutationWithUrl<User, { id: string; role: string }>(
-    'put',
-    (vars) => `/admin/users/${vars.id}`,
-  );
+  return useApiMutationWithUrl<User, { id: string; role: string }>('put', (vars) => `/admin/users/${vars.id}`, {
+    invalidationKey: ['admin', 'users'],
+  });
 }
 
 export function useDeleteUser() {
-  return useApiMutationWithUrl<void, { id: string }>('delete', (vars) => `/admin/users/${vars.id}`);
+  return useApiMutationWithUrl<void, { id: string }>('delete', (vars) => `/admin/users/${vars.id}`, {
+    invalidationKey: ['admin', 'users'],
+  });
 }
 
 export function useAdminAnalytics() {
@@ -53,15 +49,8 @@ export function useAdminAnalytics() {
   }>(['admin', 'analytics'], '/admin/analytics');
 }
 
-export function useAuditLogs(params?: {
-  page?: number;
-  limit?: number;
-  search?: string;
-  severity?: string;
-}) {
-  return useApiQuery<{ logs: AuditLogItem[]; meta: PaginationMeta }>(
-    ['admin', 'logs'],
-    '/admin/logs',
-    { params: params as Record<string, string | number | undefined> },
-  );
+export function useAuditLogs(params?: { page?: number; limit?: number; search?: string; severity?: string }) {
+  return useApiQuery<{ logs: AuditLogItem[]; meta: PaginationMeta }>(['admin', 'logs'], '/admin/logs', {
+    params: params as Record<string, string | number | undefined>,
+  });
 }

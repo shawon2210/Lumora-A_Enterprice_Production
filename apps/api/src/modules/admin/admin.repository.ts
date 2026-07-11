@@ -44,7 +44,20 @@ export const adminRepository = {
   },
 
   findUserById(id: string) {
-    return prisma.user.findUnique({ where: { id } });
+    return prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        avatar: true,
+        role: true,
+        subscription: true,
+        emailVerified: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   },
 
   updateUserRole(id: string, role: string) {

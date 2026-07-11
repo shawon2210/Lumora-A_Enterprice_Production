@@ -1,5 +1,6 @@
 import { Users, MessageCircle, Heart, Share2, Globe, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SEO } from '@/components/seo';
 
 const communityFeatures = [
   {
@@ -66,10 +67,9 @@ const testimonials = [
 export default function CommunityPage() {
   return (
     <>
-      <title>Community | Lumora</title>
-      <meta
-        name="description"
-        content="Join Lumora's vibrant community of creators. Connect, learn, and grow with 50K+ active members worldwide."
+      <SEO
+        title="Community | Lumora"
+        description="Join Lumora's vibrant community of creators. Connect, learn, and grow with 50K+ active members worldwide."
       />
 
       {/* Hero */}

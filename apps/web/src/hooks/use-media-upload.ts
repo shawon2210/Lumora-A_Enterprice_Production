@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAuthStore } from '@/store/auth-store';
 
 interface UploadState {
   progress: number;
@@ -23,7 +24,7 @@ export function useMediaUpload() {
       formData.append('file', file);
 
       try {
-        const token = localStorage.getItem('lumora_access_token');
+        const token = useAuthStore.getState().accessToken;
         const xhr = new XMLHttpRequest();
 
         await new Promise<void>((resolve, reject) => {

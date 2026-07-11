@@ -14,15 +14,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useMedia, useDeleteMedia, useMediaUpload, useDebounce } from '@/hooks';
-import { Card, Badge, Button, Skeleton } from '@lumora/ui';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@lumora/ui';
+import { Card, Badge, Button, Skeleton, toast } from '@lumora/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@lumora/ui';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { UploadDropzone } from '@/components/upload-dropzone';
 import type { MediaFile } from '@lumora/shared';
@@ -98,10 +91,12 @@ function MediaContent() {
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<MediaFile | null>(null);
   const debouncedSearch = useDebounce(search, 300);
 
   const { data, isLoading, isError, refetch } = useMedia({
+    page,
     search: debouncedSearch || undefined,
     type: typeFilter !== 'all' ? typeFilter : undefined,
   });
@@ -112,15 +107,26 @@ function MediaContent() {
 
   const handleUpload = useCallback(
     async (file: File) => {
-      await upload(file);
+      const ok = await upload(file);
+      if (ok) {
+        toast({ title: 'File uploaded', variant: 'success' });
+        setPage(1);
+      } else {
+        toast({ title: 'Upload failed', variant: 'destructive' });
+      }
     },
     [upload],
   );
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
-    await deleteMutation.mutateAsync({ id: deleteTarget.id });
-    setDeleteTarget(null);
+    try {
+      await deleteMutation.mutateAsync({ id: deleteTarget.id });
+      setDeleteTarget(null);
+      toast({ title: 'File deleted', variant: 'success' });
+    } catch {
+      toast({ title: 'Failed to delete file', variant: 'destructive' });
+    }
   }, [deleteTarget, deleteMutation]);
 
   if (isLoading) {
@@ -155,9 +161,7 @@ function MediaContent() {
         <div className="text-center">
           <AlertCircle className="text-error mx-auto h-12 w-12" />
           <h2 className="text-text-primary mt-4 text-lg font-semibold">Failed to load media</h2>
-          <p className="text-text-secondary mt-2 text-sm">
-            There was an error fetching your media files.
-          </p>
+          <p className="text-text-secondary mt-2 text-sm">There was an error fetching your media files.</p>
           <Button onClick={() => refetch()} className="mt-6 gap-2">
             <RefreshCw className="h-4 w-4" />
             Try again
@@ -227,6 +231,25 @@ function MediaContent() {
         </div>
       </div>
 
+      {data?.meta && data.meta.totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+            Previous
+          </Button>
+          <span className="text-text-tertiary text-xs">
+            Page {data.meta.page} of {data.meta.totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page >= data.meta.totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      )}
+
       {viewMode === 'grid' ? (
         <motion.div
           variants={container}
@@ -240,9 +263,7 @@ function MediaContent() {
             return (
               <motion.div key={media.id} variants={item}>
                 <Card className="glass-card group overflow-hidden">
-                  <div
-                    className={`flex aspect-[4/3] items-center justify-center bg-gradient-to-br ${config.gradient}`}
-                  >
+                  <div className={`flex aspect-[4/3] items-center justify-center bg-gradient-to-br ${config.gradient}`}>
                     <Icon className="h-10 w-10 text-white/40" />
                   </div>
                   <div className="p-4">
@@ -255,7 +276,11 @@ function MediaContent() {
                       <span>{formatDate(media.createdAt)}</span>
                     </div>
                     <div className="border-border-secondary mt-3 flex items-center gap-2 border-t pt-3 opacity-0 transition-all group-hover:opacity-100">
-                      <button className="text-text-tertiary hover:text-text-primary hover:bg-surface-secondary rounded-lg p-1.5 transition-all">
+                      <button
+                        onClick={() => window.open(media.url, '_blank')}
+                        className="text-text-tertiary hover:text-text-primary hover:bg-surface-secondary rounded-lg p-1.5 transition-all"
+                        aria-label={`Download ${media.name}`}
+                      >
                         <Download className="h-4 w-4" />
                       </button>
                       <button
@@ -294,7 +319,11 @@ function MediaContent() {
                     </p>
                   </div>
                   <Badge variant={config.variant}>{config.label}</Badge>
-                  <button className="text-text-tertiary hover:text-text-primary hover:bg-surface-secondary rounded-lg p-1.5 transition-all">
+                  <button
+                    onClick={() => window.open(media.url, '_blank')}
+                    className="text-text-tertiary hover:text-text-primary hover:bg-surface-secondary rounded-lg p-1.5 transition-all"
+                    aria-label={`Download ${media.name}`}
+                  >
                     <Download className="h-4 w-4" />
                   </button>
                   <button
@@ -323,20 +352,14 @@ function MediaContent() {
           <DialogHeader>
             <DialogTitle>Delete Media</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete &ldquo;{deleteTarget?.name}&rdquo;? This action cannot
-              be undone.
+              Are you sure you want to delete &ldquo;{deleteTarget?.name}&rdquo;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleteMutation.isPending}
-              className="gap-2"
-            >
+            <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending} className="gap-2">
               {deleteMutation.isPending ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (

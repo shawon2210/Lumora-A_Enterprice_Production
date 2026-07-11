@@ -24,21 +24,28 @@ export function useApiQuery<T>(
   });
 }
 
+interface MutationOptions<TData, TVariables> extends UseMutationOptions<TData, ApiClientError, TVariables> {
+  invalidationKey?: QueryKey;
+}
+
 export function useApiMutation<TData, TVariables = void>(
   method: 'post' | 'put' | 'patch' | 'delete',
   url: string,
-  options?: UseMutationOptions<TData, ApiClientError, TVariables>,
+  options?: MutationOptions<TData, TVariables>,
 ) {
   const queryClient = useQueryClient();
+  const { invalidationKey, ...mutationOptions } = options || {};
   return useMutation<TData, ApiClientError, TVariables>({
     mutationFn: (variables) =>
       (api[method] as (url: string, body?: unknown) => Promise<TData>)(
         url,
         variables as unknown as Record<string, unknown>,
       ),
-    ...options,
+    ...mutationOptions,
     onSuccess: (...args) => {
-      queryClient.invalidateQueries();
+      if (invalidationKey) {
+        queryClient.invalidateQueries({ queryKey: invalidationKey });
+      }
       options?.onSuccess?.(...args);
     },
   });
@@ -47,18 +54,21 @@ export function useApiMutation<TData, TVariables = void>(
 export function useApiMutationWithUrl<TData, TVariables = void>(
   method: 'post' | 'put' | 'patch' | 'delete',
   urlFn: (variables: TVariables) => string,
-  options?: UseMutationOptions<TData, ApiClientError, TVariables>,
+  options?: MutationOptions<TData, TVariables>,
 ) {
   const queryClient = useQueryClient();
+  const { invalidationKey, ...mutationOptions } = options || {};
   return useMutation<TData, ApiClientError, TVariables>({
     mutationFn: (variables) =>
       (api[method] as (url: string, body?: unknown) => Promise<TData>)(
         urlFn(variables),
         variables as unknown as Record<string, unknown>,
       ),
-    ...options,
+    ...mutationOptions,
     onSuccess: (...args) => {
-      queryClient.invalidateQueries();
+      if (invalidationKey) {
+        queryClient.invalidateQueries({ queryKey: invalidationKey });
+      }
       options?.onSuccess?.(...args);
     },
   });

@@ -20,12 +20,13 @@ export function useUnreadCount() {
 }
 
 export function useMarkNotificationRead() {
-  return useApiMutationWithUrl<void, { id: string }>(
-    'put',
-    (vars) => `/user/notifications/${vars.id}/read`,
-  );
+  return useApiMutationWithUrl<void, { id: string }>('put', (vars) => `/user/notifications/${vars.id}/read`, {
+    invalidationKey: ['notifications'],
+  });
 }
 
 export function useMarkAllNotificationsRead() {
-  return useApiMutation<void>('put', '/user/notifications/read-all');
+  return useApiMutation<void>('put', '/user/notifications/read-all', {
+    invalidationKey: ['notifications'],
+  });
 }

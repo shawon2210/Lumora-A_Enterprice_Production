@@ -1,3 +1,5 @@
+import { useAuthStore } from '@/store/auth-store';
+
 type RequestOptions = {
   headers?: Record<string, string>;
   params?: Record<string, string | number | undefined>;
@@ -24,54 +26,37 @@ class ApiClient {
     this.baseUrl = import.meta.env.VITE_API_URL || '/api/v1';
   }
 
-  private getTokens() {
-    const accessToken = localStorage.getItem('lumora_access_token');
-    const refreshToken = localStorage.getItem('lumora_refresh_token');
-    return { accessToken, refreshToken };
-  }
-
-  private setTokens(accessToken: string, refreshToken: string) {
-    localStorage.setItem('lumora_access_token', accessToken);
-    localStorage.setItem('lumora_refresh_token', refreshToken);
-  }
-
-  clearTokens() {
-    localStorage.removeItem('lumora_access_token');
-    localStorage.removeItem('lumora_refresh_token');
+  private getAccessToken(): string | null {
+    return useAuthStore.getState().accessToken;
   }
 
   private async refreshSession(): Promise<boolean> {
-    const { refreshToken } = this.getTokens();
-    if (!refreshToken) return false;
-
     try {
       const res = await fetch(`${this.baseUrl}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
+        credentials: 'include',
       });
 
       if (!res.ok) {
-        this.clearTokens();
+        useAuthStore.getState().logout();
         return false;
       }
 
-      const data = await res.json();
-      this.setTokens(data.data.accessToken, data.data.refreshToken);
+      const json = await res.json();
+      const newAccessToken = json.data?.accessToken || json.accessToken;
+      if (newAccessToken) {
+        useAuthStore.getState().setAccessToken(newAccessToken);
+      }
       return true;
     } catch {
-      this.clearTokens();
+      useAuthStore.getState().logout();
       return false;
     }
   }
 
-  private async request<T>(
-    method: string,
-    path: string,
-    body?: unknown,
-    options?: RequestOptions,
-  ): Promise<T> {
-    const { accessToken } = this.getTokens();
+  private async request<T>(method: string, path: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    const accessToken = this.getAccessToken();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...options?.headers,
@@ -96,6 +81,7 @@ class ApiClient {
       headers,
       body: body ? JSON.stringify(body) : undefined,
       signal: options?.signal,
+      credentials: 'include',
     });
 
     if (res.status === 401 && accessToken) {
@@ -106,10 +92,29 @@ class ApiClient {
       this.refreshPromise = null;
 
       if (refreshed) {
-        return this.request<T>(method, path, body, options);
+        const newToken = this.getAccessToken();
+        if (newToken) {
+          headers['Authorization'] = `Bearer ${newToken}`;
+        }
+        const retryRes = await fetch(url, {
+          method,
+          headers,
+          body: body ? JSON.stringify(body) : undefined,
+          signal: options?.signal,
+          credentials: 'include',
+        });
+        const retryData = await retryRes.json();
+        if (!retryRes.ok) {
+          throw new ApiClientError(
+            retryRes.status,
+            retryData.error?.code || 'UNKNOWN_ERROR',
+            retryData.error?.message || 'Something went wrong',
+            retryData.error?.details,
+          );
+        }
+        return retryData.data !== undefined ? retryData.data : retryData;
       }
 
-      this.clearTokens();
       window.dispatchEvent(new CustomEvent('auth:logout'));
       throw new ApiClientError(401, 'UNAUTHORIZED', 'Session expired');
     }

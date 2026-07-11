@@ -82,12 +82,7 @@ export const authService = {
 
     const tokens = createTokens(session.user.id, session.user.role);
     const expiresAt = new Date(Date.now() + ONE_DAY_MS);
-    await authRepository.createSession(
-      session.user.id,
-      tokens.accessToken,
-      tokens.refreshToken,
-      expiresAt,
-    );
+    await authRepository.createSession(session.user.id, tokens.accessToken, tokens.refreshToken, expiresAt);
 
     const refreshedUser = await authRepository.findUserById(payload.sub);
     if (!refreshedUser) {
@@ -128,6 +123,20 @@ export const authService = {
     await authRepository.markResetTokenUsed(record.id);
   },
 
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const user = await authRepository.findUserById(userId);
+    if (!user || !user.password) {
+      throw new UnauthorizedError('Invalid password');
+    }
+    const valid = await comparePassword(currentPassword, user.password);
+    if (!valid) {
+      throw new UnauthorizedError('Current password is incorrect');
+    }
+    const hashed = await hashPassword(newPassword);
+    await authRepository.updateUserPassword(userId, hashed);
+    await authRepository.deleteUserSessions(userId);
+  },
+
   async getProfile(userId: string) {
     const user = await authRepository.findUserById(userId);
     if (!user) {
@@ -141,12 +150,7 @@ export const authService = {
     if (account && account.user) {
       const tokens = createTokens(account.user.id, account.user.role);
       const expiresAt = new Date(Date.now() + ONE_DAY_MS);
-      await authRepository.createSession(
-        account.user.id,
-        tokens.accessToken,
-        tokens.refreshToken,
-        expiresAt,
-      );
+      await authRepository.createSession(account.user.id, tokens.accessToken, tokens.refreshToken, expiresAt);
       return { ...tokens, user: excludePassword(account.user), isNew: false };
     }
 

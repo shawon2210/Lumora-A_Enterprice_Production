@@ -8,6 +8,7 @@ import {
   loginSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  changePasswordSchema,
 } from '@lumora/validators';
 
 const router = Router();
@@ -106,11 +107,7 @@ router.post('/refresh', authController.refresh);
  *       200:
  *         description: If email exists, reset link sent
  */
-router.post(
-  '/forgot-password',
-  validate({ body: forgotPasswordSchema }),
-  authController.forgotPassword,
-);
+router.post('/forgot-password', validate({ body: forgotPasswordSchema }), authController.forgotPassword);
 
 /**
  * @openapi
@@ -131,11 +128,7 @@ router.post(
  *       200:
  *         description: Password reset successfully
  */
-router.post(
-  '/reset-password',
-  validate({ body: resetPasswordSchema }),
-  authController.resetPassword,
-);
+router.post('/reset-password', validate({ body: resetPasswordSchema }), authController.resetPassword);
 
 /**
  * @openapi
@@ -149,6 +142,8 @@ router.post(
  *       200:
  *         description: Current user profile
  */
+router.put('/change-password', authenticate, validate({ body: changePasswordSchema }), authController.changePassword);
+
 router.get('/me', authenticate, authController.getMe);
 
 /**
@@ -161,10 +156,7 @@ router.get('/me', authenticate, authController.getMe);
  *       302:
  *         description: Redirect to Google
  */
-router.get(
-  '/google',
-  passport.authenticate('google', { scope: ['profile', 'email'], session: false }),
-);
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
 
 /**
  * @openapi

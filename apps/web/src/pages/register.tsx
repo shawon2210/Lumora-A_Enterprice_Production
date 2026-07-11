@@ -9,6 +9,7 @@ import { registerSchema } from '@lumora/validators';
 import { useRegister } from '@/hooks';
 import { useAuthStore } from '@/store/auth-store';
 import { Button } from '@lumora/ui';
+import type { ApiClientError } from '@/services/api-client';
 
 const registerFormSchema = registerSchema
   .extend({
@@ -23,7 +24,7 @@ type RegisterFormInput = z.infer<typeof registerFormSchema>;
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const setTokens = useAuthStore((s) => s.setTokens);
+  const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const registerMutation = useRegister();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -46,9 +47,9 @@ export default function RegisterPage() {
         email: data.email,
         password: data.password,
       });
-      setTokens(response.accessToken, response.refreshToken);
+      setAccessToken(response.accessToken);
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch {
       // error is surfaced via mutation state
     }
   };
@@ -67,11 +68,7 @@ export default function RegisterPage() {
       >
         {/* Header */}
         <div className="mb-8 text-center">
-          <Link
-            to="/"
-            className="text-2xl italic text-white"
-            style={{ fontFamily: "'Instrument Serif', serif" }}
-          >
+          <Link to="/" className="text-2xl italic text-white" style={{ fontFamily: "'Instrument Serif', serif" }}>
             Lumora
           </Link>
           <h1 className="mt-6 text-2xl font-semibold text-white">Create your account</h1>
@@ -131,7 +128,7 @@ export default function RegisterPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400"
           >
-            {(registerMutation.error as any)?.message || 'Registration failed'}
+            {(registerMutation.error as ApiClientError)?.message || 'Registration failed'}
           </motion.div>
         )}
 
@@ -203,10 +200,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label
-              htmlFor="confirmPassword"
-              className="mb-1.5 block text-sm font-medium text-white/80"
-            >
+            <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-white/80">
               Confirm Password
             </label>
             <div className="relative">
@@ -228,9 +222,7 @@ export default function RegisterPage() {
               </button>
             </div>
             {form.formState.errors.confirmPassword && (
-              <p className="mt-1 text-xs text-red-400">
-                {form.formState.errors.confirmPassword.message}
-              </p>
+              <p className="mt-1 text-xs text-red-400">{form.formState.errors.confirmPassword.message}</p>
             )}
           </div>
 
@@ -245,10 +237,7 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-white/40">
           Already have an account?{' '}
-          <Link
-            to="/login"
-            className="text-primary-400 hover:text-primary-300 font-medium transition-colors"
-          >
+          <Link to="/login" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
             Sign in
           </Link>
         </p>

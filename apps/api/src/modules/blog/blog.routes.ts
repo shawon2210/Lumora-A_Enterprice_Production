@@ -1,14 +1,9 @@
 ﻿import { Router } from 'express';
-import { listPosts, getPost, createPost, updatePost, deletePost } from './blog.controller';
+import { listPosts, getPost, getPostById, createPost, updatePost, deletePost } from './blog.controller';
 import { authenticate } from '@/middleware/auth';
 import { validate } from '@/middleware/validate';
 import { auditLog } from '@/middleware/audit';
-import {
-  createPostSchema,
-  updatePostSchema,
-  paginationSchema,
-  paramsSchema,
-} from '@lumora/validators';
+import { createPostSchema, updatePostSchema, paginationSchema, paramsSchema } from '@lumora/validators';
 
 const router = Router();
 
@@ -96,6 +91,7 @@ router.get('/posts', validate({ query: paginationSchema }), listPosts);
  *       404:
  *         description: Blog post not found
  */
+router.get('/posts/id/:id', validate({ params: paramsSchema }), getPostById);
 router.get('/posts/:slug', getPost);
 
 /**
@@ -144,13 +140,7 @@ router.get('/posts/:slug', getPost);
  *                     data:
  *                       $ref: '#/components/schemas/BlogPost'
  */
-router.post(
-  '/posts',
-  authenticate,
-  validate({ body: createPostSchema }),
-  auditLog('CREATE', 'BlogPost'),
-  createPost,
-);
+router.post('/posts', authenticate, validate({ body: createPostSchema }), auditLog('CREATE', 'BlogPost'), createPost);
 
 /**
  * @openapi

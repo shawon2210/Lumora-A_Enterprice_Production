@@ -65,6 +65,12 @@ export class BlogService {
     );
   }
 
+  async getPostById(id: string) {
+    const post = await blogRepository.findPostById(id);
+    if (!post) throw new NotFoundError('Blog post');
+    return formatPost(post);
+  }
+
   async getPost(slug: string) {
     const cached = await cache.get<any>(`blog:post:${slug}`);
     if (cached !== null) return cached;

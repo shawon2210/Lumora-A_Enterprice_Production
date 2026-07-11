@@ -23,7 +23,7 @@ export function AdminRoute() {
   }
 
   if (user?.role !== UserRole.ADMIN) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/forbidden" replace />;
   }
 
   return <Outlet />;

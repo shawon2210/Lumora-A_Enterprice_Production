@@ -7,6 +7,7 @@ import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '@lumora/validators';
 import { useForgotPassword } from '@/hooks';
 import { Button } from '@lumora/ui';
+import type { ApiClientError } from '@/services/api-client';
 
 export default function ForgotPasswordPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -21,7 +22,7 @@ export default function ForgotPasswordPage() {
     try {
       await forgotPasswordMutation.mutateAsync({ email: data.email });
       setSubmitted(true);
-    } catch (err: any) {
+    } catch {
       // error is surfaced via mutation state
     }
   };
@@ -40,18 +41,12 @@ export default function ForgotPasswordPage() {
       >
         {/* Header */}
         <div className="mb-8 text-center">
-          <Link
-            to="/"
-            className="text-2xl italic text-white"
-            style={{ fontFamily: "'Instrument Serif', serif" }}
-          >
+          <Link to="/" className="text-2xl italic text-white" style={{ fontFamily: "'Instrument Serif', serif" }}>
             Lumora
           </Link>
           <h1 className="mt-6 text-2xl font-semibold text-white">Reset your password</h1>
           <p className="mt-2 text-sm text-white/60">
-            {submitted
-              ? 'Check your email for a reset link'
-              : "Enter your email and we'll send you a reset link"}
+            {submitted ? 'Check your email for a reset link' : "Enter your email and we'll send you a reset link"}
           </p>
         </div>
 
@@ -76,7 +71,7 @@ export default function ForgotPasswordPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400"
           >
-            {(forgotPasswordMutation.error as any)?.message || 'Something went wrong'}
+            {(forgotPasswordMutation.error as ApiClientError)?.message || 'Something went wrong'}
           </motion.div>
         )}
 

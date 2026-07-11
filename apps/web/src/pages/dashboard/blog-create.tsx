@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
-import { useCreatePost, useUpdatePost, useBlogPost } from '@/hooks';
-import { Button, Skeleton } from '@lumora/ui';
+import { useCreatePost, useUpdatePost, useBlogPostById } from '@/hooks';
+import { Button, Skeleton, toast } from '@lumora/ui';
 
 function slugify(text: string) {
   return text
@@ -17,7 +17,7 @@ export default function BlogCreatePage() {
   const { id } = useParams();
   const isEdit = !!id;
 
-  const { data: existingPost, isLoading: loadingPost } = useBlogPost(id || '');
+  const { data: existingPost, isLoading: loadingPost } = useBlogPostById(id || '');
 
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
@@ -75,12 +75,21 @@ export default function BlogCreatePage() {
       status,
     };
 
-    if (isEdit) {
-      await updatePost.mutateAsync({ id: id!, ...payload });
-    } else {
-      await createPost.mutateAsync(payload as unknown as Record<string, unknown>);
+    try {
+      if (isEdit) {
+        await updatePost.mutateAsync({ id: id!, ...payload });
+        toast({ title: 'Post updated', variant: 'success' });
+      } else {
+        await createPost.mutateAsync(payload as unknown as Record<string, unknown>);
+        toast({ title: 'Post created', variant: 'success' });
+      }
+      navigate('/dashboard/blog');
+    } catch {
+      toast({
+        title: isEdit ? 'Failed to update post' : 'Failed to create post',
+        variant: 'destructive',
+      });
     }
-    navigate('/dashboard/blog');
   };
 
   const isPending = createPost.isPending || updatePost.isPending;
@@ -108,9 +117,7 @@ export default function BlogCreatePage() {
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <h1 className="text-text-primary text-2xl font-semibold">
-          {isEdit ? 'Edit Post' : 'New Post'}
-        </h1>
+        <h1 className="text-text-primary text-2xl font-semibold">{isEdit ? 'Edit Post' : 'New Post'}</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -161,9 +168,7 @@ export default function BlogCreatePage() {
         </div>
 
         <div>
-          <label className="text-text-primary mb-1.5 block text-sm font-medium">
-            Cover Image URL
-          </label>
+          <label className="text-text-primary mb-1.5 block text-sm font-medium">Cover Image URL</label>
           <input
             value={coverImage}
             onChange={(e) => setCoverImage(e.target.value)}
@@ -173,9 +178,7 @@ export default function BlogCreatePage() {
         </div>
 
         <div>
-          <label className="text-text-primary mb-1.5 block text-sm font-medium">
-            Tags (comma separated)
-          </label>
+          <label className="text-text-primary mb-1.5 block text-sm font-medium">Tags (comma separated)</label>
           <input
             value={tags}
             onChange={(e) => setTags(e.target.value)}
@@ -191,9 +194,7 @@ export default function BlogCreatePage() {
               type="button"
               onClick={() => setStatus('DRAFT')}
               className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${
-                status === 'DRAFT'
-                  ? 'bg-amber-500/10 text-amber-400'
-                  : 'text-text-secondary hover:text-text-primary'
+                status === 'DRAFT' ? 'bg-amber-500/10 text-amber-400' : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               Draft

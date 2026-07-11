@@ -4,7 +4,6 @@ import type { User } from '@lumora/shared';
 export interface LoginResponse {
   user: User;
   accessToken: string;
-  refreshToken: string;
 }
 
 export interface RegisterInput {
@@ -16,6 +15,7 @@ export interface RegisterInput {
 export interface LoginInput {
   email: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 export const authService = {
@@ -31,8 +31,7 @@ export const authService = {
     try {
       await api.post('/auth/logout');
     } finally {
-      localStorage.removeItem('lumora_access_token');
-      localStorage.removeItem('lumora_refresh_token');
+      useAuthStore.getState().logout();
     }
   },
 
@@ -47,8 +46,6 @@ export const authService = {
   async resetPassword(token: string, password: string): Promise<void> {
     await api.post('/auth/reset-password', { token, password });
   },
-
-  async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
-    return api.post('/auth/refresh', { refreshToken });
-  },
 };
+
+import { useAuthStore } from '@/store/auth-store';
