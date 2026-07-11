@@ -1,7 +1,7 @@
 import { Menu, X } from 'lucide-react';
 import { SEO } from '@/components/seo';
-import { useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const videoUrls = [
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_081127_0992a171-d3c6-4978-8213-0ec5df8b6d63.mp4',
@@ -11,17 +11,40 @@ const videoUrls = [
 ];
 
 const videoLabels = ['Golden Hour', 'Still Water', 'Deep Woods', 'Quiet Dawn'];
+
 const navLinks = [
-  { label: 'How It Works', path: '/#how-it-works' },
-  { label: 'Features', path: '/#features' },
-  { label: 'Pricing', path: '/#pricing' },
-  { label: 'Community', path: '/#community' },
+  { label: 'How It Works', id: 'how-it-works' },
+  { label: 'Features', id: 'features' },
+  { label: 'Pricing', id: 'pricing' },
+  { label: 'Community', id: 'community' },
 ];
 
 export default function LandingPage() {
   const [activeVideo, setActiveVideo] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  // Handle hash navigation on mount and hash change
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  }, [location.hash]);
+
+  const scrollToSection = useCallback((id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setMobileMenuOpen(false);
+  }, []);
 
   const handleVideoSwitch = useCallback(
     (index: number) => {
@@ -86,15 +109,15 @@ export default function LandingPage() {
             {/* Desktop Nav */}
             <div className="hidden items-center md:flex">
               <div className="liquid-glass flex items-center gap-1 rounded-full px-2 py-2">
-                {navLinks.map((link, index) => (
-                  <Link
-                    key={index}
-                    to={link.path}
+                {navLinks.map((link) => (
+                  <button
+                    key={link.id}
+                    onClick={() => scrollToSection(link.id)}
                     className="rounded-full px-4 py-2 text-sm text-white/90 transition-colors hover:text-white"
                     style={{ fontFamily: 'system-ui, sans-serif' }}
                   >
                     {link.label}
-                  </Link>
+                  </button>
                 ))}
                 <Link
                   to="/auth/register"
@@ -135,18 +158,17 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-8">
                 {navLinks.map((link, i) => (
-                  <Link
-                    key={link.path}
-                    to={link.path}
+                  <button
+                    key={link.id}
+                    onClick={() => scrollToSection(link.id)}
                     className="animate-menu-slide-up text-3xl text-white"
                     style={{
                       fontFamily: 'system-ui, sans-serif',
                       animationDelay: `${(i + 2) * 50}ms`,
                     }}
-                    onClick={() => setMobileMenuOpen(false)}
                   >
                     {link.label}
-                  </Link>
+                  </button>
                 ))}
                 <Link
                   to="/auth/register"
