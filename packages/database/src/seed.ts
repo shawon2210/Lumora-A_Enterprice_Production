@@ -3,14 +3,16 @@ import { prisma } from './index';
 async function main() {
   console.log('Seeding database...');
 
+  await prisma.user.deleteMany({
+    where: { email: { in: ['admin@lumora.app', 'moderator@lumora.app', 'user@lumora.app'] } },
+  });
+
   // Create admin user (password: Admin123!)
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@lumora.app' },
-    update: {},
-    create: {
+  const admin = await prisma.user.create({
+    data: {
       email: 'admin@lumora.app',
       name: 'Admin User',
-      password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.qT.4TmGmFqO8i', // 'Admin123!'
+      password: '$2a$12$fiN0JnKrynfYVOZweg/IUORwqfN11Vzw7.i6aYR4UpASCdJujUQJW', // 'Admin123!'
       role: 'ADMIN',
       subscription: 'ENTERPRISE',
       emailVerified: true,
@@ -19,13 +21,11 @@ async function main() {
   console.log('Created admin user:', admin.email);
 
   // Create moderator user (password: Moderator123!)
-  const moderator = await prisma.user.upsert({
-    where: { email: 'moderator@lumora.app' },
-    update: {},
-    create: {
+  const moderator = await prisma.user.create({
+    data: {
       email: 'moderator@lumora.app',
       name: 'Moderator User',
-      password: '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // 'Moderator123!'
+      password: '$2a$12$XCHTpT6WaMj1d2MtRI04UuGOb8kzP7/LNdH5X/ZiIMlupOA3YJqs6', // 'Moderator123!'
       role: 'MODERATOR',
       subscription: 'PRO',
       emailVerified: true,
@@ -34,13 +34,11 @@ async function main() {
   console.log('Created moderator user:', moderator.email);
 
   // Create regular user (password: User123!)
-  const user = await prisma.user.upsert({
-    where: { email: 'user@lumora.app' },
-    update: {},
-    create: {
+  const user = await prisma.user.create({
+    data: {
       email: 'user@lumora.app',
       name: 'Regular User',
-      password: '$2a$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', // 'User123!'
+      password: '$2a$12$6JJ6dCXwH3Ux1eiZoxj1aeTjt6hWuDV6tLFqj4dvZXDf8MpjG7sia', // 'User123!'
       role: 'USER',
       subscription: 'FREE',
       emailVerified: true,

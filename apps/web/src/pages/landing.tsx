@@ -2,7 +2,7 @@ import { Menu, X } from 'lucide-react';
 import { SEO } from '@/components/seo';
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { navigationLinks } from '@/config/navigation';
+import { navLinks } from '@/config/navigation';
 
 const videoUrls = [
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_081127_0992a171-d3c6-4978-8213-0ec5df8b6d63.mp4',
@@ -103,10 +103,10 @@ export default function LandingPage() {
             {/* Desktop Nav */}
             <div className="hidden items-center md:flex">
               <div className="liquid-glass flex items-center gap-1 rounded-full px-2 py-2">
-                {navigationLinks.map((link) => (
+                {navLinks.map((link) => (
                   <button
-                    key={link.id}
-                    onClick={() => scrollToSection(link.id)}
+                    key={link.path}
+                    onClick={() => scrollToSection(link.path.replace('/', ''))}
                     className="rounded-full px-4 py-2 text-sm text-white/90 transition-colors hover:text-white"
                     style={{ fontFamily: 'system-ui, sans-serif' }}
                   >
@@ -151,10 +151,10 @@ export default function LandingPage() {
             <div className="fixed inset-0 z-50 md:hidden">
               <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-8">
-                {navigationLinks.map((link, i) => (
+                {navLinks.map((link, i) => (
                   <button
-                    key={link.id}
-                    onClick={() => scrollToSection(link.id)}
+                    key={link.path}
+                    onClick={() => scrollToSection(link.path.replace('/', ''))}
                     className="animate-menu-slide-up text-3xl text-white"
                     style={{
                       fontFamily: 'system-ui, sans-serif',

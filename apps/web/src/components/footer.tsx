@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { navigationLinks } from '@/config/navigation';
+import { navLinks } from '@/config/navigation';
 
 export function Footer() {
   return (
@@ -7,10 +7,10 @@ export function Footer() {
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-6 py-4 sm:flex-row sm:justify-between">
         <p className="text-text-tertiary text-xs">&copy; {new Date().getFullYear()} Lumora. All rights reserved.</p>
         <nav className="flex flex-wrap items-center justify-center gap-4 sm:gap-6" aria-label="Footer navigation">
-          {navigationLinks.map((link) => (
+          {navLinks.map((link) => (
             <Link
-              key={link.href}
-              to={link.href}
+              key={link.path}
+              to={link.path}
               className="text-text-tertiary hover:text-text-primary text-xs transition-colors"
             >
               {link.label}
