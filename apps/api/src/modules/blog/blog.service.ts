@@ -24,7 +24,12 @@ interface UpdatePostInput {
 
 type PostRaw = NonNullable<Awaited<ReturnType<typeof blogRepository.findPostBySlug>>>;
 
-function formatPost(post: PostRaw) {
+type FormattedPost = Omit<PostRaw, 'author' | 'tags' | 'authorId' | 'seoTitle' | 'seoDescription' | 'canonicalUrl'> & {
+  author: { id: string; name: string; avatar: string | null };
+  tags: string[];
+};
+
+function formatPost(post: PostRaw): FormattedPost {
   const {
     author,
     tags: postTags,
@@ -37,8 +42,11 @@ function formatPost(post: PostRaw) {
   return {
     ...rest,
     author: { id: author.id, name: author.name, avatar: author.avatar },
-    tags: (postTags as Array<{ tag?: { name?: string } }>).map((pt) => pt.tag?.name).filter(Boolean) ?? [],
-  };
+    tags:
+      (postTags as Array<{ tag?: { name?: string } }>)
+        .map((pt) => pt.tag?.name)
+        .filter((name): name is string => Boolean(name)) ?? [],
+  } as FormattedPost;
 }
 
 export class BlogService {
@@ -71,8 +79,8 @@ export class BlogService {
     return formatPost(post);
   }
 
-  async getPost(slug: string) {
-    const cached = await cache.get<unknown>(`blog:post:${slug}`);
+  async getPost(slug: string): Promise<FormattedPost> {
+    const cached = await cache.get<FormattedPost | null>(`blog:post:${slug}`);
     if (cached !== null) return cached;
 
     const post = await blogRepository.findPostBySlug(slug);
