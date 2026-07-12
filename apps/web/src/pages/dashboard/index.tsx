@@ -191,7 +191,7 @@ function DashboardContent() {
           {quickActions.map((action) => (
             <a key={action.label} href={action.href} className="block">
               <Card
-                className={`glass-card bg-gradient-to-br p-5 ${action.color} cursor-pointer transition-all hover:brightness-110`}
+                className={`glass-card bg-linear-to-br p-5 ${action.color} cursor-pointer transition-all hover:brightness-110`}
               >
                 <action.icon className="text-primary-400 h-6 w-6" />
                 <h3 className="text-text-primary mt-3 text-sm font-medium">{action.label}</h3>

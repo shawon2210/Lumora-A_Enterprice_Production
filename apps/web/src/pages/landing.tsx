@@ -83,7 +83,7 @@ export default function LandingPage() {
         </div>
 
         {/* PNG Overlay */}
-        <div className="pointer-events-none absolute inset-0 z-[1]">
+        <div className="z-1 pointer-events-none absolute inset-0">
           <img
             src="https://soft-zoom-63098134.figma.site/_assets/v11/0b4a435b2df2747593c43d7a1c9b4578f7d8d90c.png"
             alt=""
@@ -92,7 +92,7 @@ export default function LandingPage() {
         </div>
 
         {/* Content Layer */}
-        <div className="relative z-[2] flex h-full flex-col px-4 sm:px-6 lg:px-8">
+        <div className="z-2 relative flex h-full flex-col px-4 sm:px-6 lg:px-8">
           {/* Navigation */}
           <nav className="flex items-center justify-between py-6">
             {/* Logo */}

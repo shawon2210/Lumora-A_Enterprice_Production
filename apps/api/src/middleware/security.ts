@@ -1,11 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 
 // Enhanced security headers middleware
-export function securityHeaders(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export function securityHeaders(req: Request, res: Response, next: NextFunction) {
   // Prevent clickjacking
   res.setHeader('X-Frame-Options', 'DENY');
 
@@ -30,10 +26,7 @@ export function securityHeaders(
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 
   // Permissions Policy
-  res.setHeader(
-    'Permissions-Policy',
-    'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
-  );
+  res.setHeader('Permissions-Policy', 'camera=(), geolocation=(), microphone=(), payment=(), usb=()');
 
   next();
 }

@@ -5,4 +5,4 @@ export const navigationLinks = [
   { label: 'Community', href: '/community', id: 'community' },
 ] as const;
 
-export type NavigationLink = typeof navigationLinks[number];
+export type NavigationLink = (typeof navigationLinks)[number];
