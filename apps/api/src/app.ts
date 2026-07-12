@@ -91,7 +91,7 @@ app.get('/ready', async (_req, res) => {
   try {
     const { prisma } = await import('@lumora/database');
     await prisma.$queryRaw`SELECT 1`;
-    const io = (globalThis as any).io;
+    const io = (globalThis as Record<string, unknown>).io;
     res.json({ status: 'ok', database: 'connected', socketio: !!io });
   } catch {
     res.status(503).json({ status: 'error', database: 'disconnected' });

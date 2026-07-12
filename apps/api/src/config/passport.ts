@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as GithubStrategy } from 'passport-github2';
@@ -5,7 +6,6 @@ import { authService } from '@/modules/auth/auth.service';
 import { config } from '@/config/env';
 
 export function configurePassport() {
-  // Google OAuth Strategy
   if (config.oauth.google.clientId && config.oauth.google.clientSecret) {
     passport.use(
       'google',
@@ -14,7 +14,7 @@ export function configurePassport() {
           clientID: config.oauth.google.clientId,
           clientSecret: config.oauth.google.clientSecret,
           callbackURL: config.oauth.google.callbackUrl,
-        } as any, // Passport types are incomplete
+        } as any,
         async (accessToken: any, refreshToken: any, profile: any, done: any) => {
           try {
             const result = await authService.handleOAuth('google', {
@@ -31,7 +31,6 @@ export function configurePassport() {
     );
   }
 
-  // GitHub OAuth Strategy
   if (config.oauth.github.clientId && config.oauth.github.clientSecret) {
     passport.use(
       'github',
@@ -41,7 +40,7 @@ export function configurePassport() {
           clientSecret: config.oauth.github.clientSecret,
           callbackURL: config.oauth.github.callbackUrl,
           passReqToCallback: true,
-        } as any, // Passport types are incomplete
+        } as any,
         async (req: any, accessToken: any, refreshToken: any, profile: any, done: any) => {
           try {
             const result = await authService.handleOAuth('github', {

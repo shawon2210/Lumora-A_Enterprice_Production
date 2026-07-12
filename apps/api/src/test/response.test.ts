@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest';
 import { sendSuccess, sendPaginated, sendMessage, sendError } from '../utils/response';
 

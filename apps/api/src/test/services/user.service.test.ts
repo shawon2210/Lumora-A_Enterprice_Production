@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { userService } from '@/modules/user/user.service';
 import { userRepository } from '@/modules/user/user.repository';

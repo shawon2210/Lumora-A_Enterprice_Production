@@ -37,7 +37,7 @@ function formatPost(post: PostRaw) {
   return {
     ...rest,
     author: { id: author.id, name: author.name, avatar: author.avatar },
-    tags: postTags?.map((pt: any) => pt.tag?.name).filter(Boolean) ?? [],
+    tags: (postTags as Array<{ tag?: { name?: string } }>).map((pt) => pt.tag?.name).filter(Boolean) ?? [],
   };
 }
 
@@ -72,7 +72,7 @@ export class BlogService {
   }
 
   async getPost(slug: string) {
-    const cached = await cache.get<any>(`blog:post:${slug}`);
+    const cached = await cache.get<unknown>(`blog:post:${slug}`);
     if (cached !== null) return cached;
 
     const post = await blogRepository.findPostBySlug(slug);

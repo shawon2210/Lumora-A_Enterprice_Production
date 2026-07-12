@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { notificationsService } from '@/modules/notifications/notifications.service';
 import { notificationsRepository } from '@/modules/notifications/notifications.repository';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module 'socket.io' {
   interface SocketOptions {
     cors?: {

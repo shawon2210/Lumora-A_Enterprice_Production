@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { authService } from '@/modules/auth/auth.service';
 import { authRepository } from '@/modules/auth/auth.repository';
